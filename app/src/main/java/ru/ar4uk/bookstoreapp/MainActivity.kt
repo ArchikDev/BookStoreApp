@@ -38,6 +38,7 @@ import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.ktx.storage
 import ru.ar4uk.bookstoreapp.data.Book
+import ru.ar4uk.bookstoreapp.ui.login.LoginScreen
 import ru.ar4uk.bookstoreapp.ui.theme.BookStoreAppTheme
 import java.io.ByteArrayOutputStream
 
@@ -47,114 +48,9 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
 
         setContent {
-            val fs = Firebase.firestore
-            val storage = Firebase.storage.reference.child("images")
-
-            val launcher = rememberLauncherForActivityResult(
-                contract = ActivityResultContracts.PickVisualMedia()
-            ) {  uri ->
-                if (uri == null) return@rememberLauncherForActivityResult
-
-                val task = storage.child("test_image.jpg").putBytes(
-                    bitmapToByteArray(this, uri)
-                )
-
-                task.addOnSuccessListener { uploadTask ->
-                    uploadTask.metadata?.reference?.downloadUrl?.addOnCompleteListener { uriTask ->
-                        saveBook(fs, uriTask.result.toString())
-                    }
-                }
-            }
-
-
-            BookStoreAppTheme {
-                MainScreen {
-                    launcher.launch(PickVisualMediaRequest(mediaType = ActivityResultContracts.PickVisualMedia.ImageOnly))
-                }
-            }
+            LoginScreen()
         }
     }
 
 
-}
-
-@Composable
-fun MainScreen(onClick: () -> Unit) {
-    val fs = Firebase.firestore
-    val list = remember {
-        mutableStateOf(emptyList<Book>())
-    }
-
-    val listener = fs.collection("books")
-        .addSnapshotListener { snapShow, exception ->
-            list.value = snapShow?.toObjects(Book::class.java) ?: emptyList()
-        }
-
-//    listener.remove() // удалить при смене экрана
-
-    Column(
-        modifier = Modifier.fillMaxSize(),
-        verticalArrangement = Arrangement.SpaceBetween
-    ) {
-        LazyColumn(
-            modifier = Modifier
-                .fillMaxWidth()
-                .fillMaxHeight(.8f)
-        ) {
-            items(list.value) { book ->
-                Card(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(10.dp)
-                ) {
-                    Text(
-                        text = book.name,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .wrapContentWidth()
-                            .padding(15.dp)
-                    )
-                }
-            }
-        }
-
-        Spacer(modifier = Modifier.height(10.dp))
-
-        Button(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(20.dp),
-            onClick = onClick
-        ) {
-            Text(
-                text = "Add Book"
-            )
-        }
-    }
-}
-
-// Массив из байтов
-@SuppressLint("Recycle")
-private fun bitmapToByteArray(context: Context, uri: Uri): ByteArray {
-    val inputStream = context.contentResolver.openInputStream(uri)
-//    val bitmap = BitmapFactory.decodeResource(context.resources, R.drawable.cat) // из ресурсов
-    val bitmap = BitmapFactory.decodeStream(inputStream)
-    val baos = ByteArrayOutputStream()
-    bitmap.compress(Bitmap.CompressFormat.JPEG, 50, baos)
-
-    return baos.toByteArray()
-}
-
-private fun saveBook(fs: FirebaseFirestore, url: String) {
-    fs.collection("books")
-        .document()
-        .set(
-            Book(
-                name = "My book",
-                description = "sdfsf",
-                price = "100",
-                category = "fiction",
-                imageUrl = url
-            )
-        )
 }
