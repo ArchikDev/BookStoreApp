@@ -17,9 +17,12 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import ru.ar4uk.bookstoreapp.R
@@ -59,6 +62,15 @@ fun LoginScreen() {
             painter = painterResource(id = R.drawable.books),
             contentDescription = null
         )
+        Spacer(modifier = Modifier.height(10.dp))
+        Text(
+            text = "Books Store",
+            fontSize = 30.sp,
+            modifier = Modifier.fillMaxWidth(),
+            textAlign = TextAlign.Center,
+            color = Color.White
+        )
+        Spacer(modifier = Modifier.height(15.dp))
         RoundedCornerTextField(
             text = emailState.value,
             onValueChange = {
