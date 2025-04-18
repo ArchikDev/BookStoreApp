@@ -23,14 +23,24 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import ru.ar4uk.bookstoreapp.R
+import ru.ar4uk.bookstoreapp.ui.login.data.MainScreenDataObject
 import ru.ar4uk.bookstoreapp.ui.theme.BoxFilterColor
 
 @Composable
-fun LoginScreen() {
-    val auth = Firebase.auth
+fun LoginScreen(
+    onNavigateToMainScreen: (MainScreenDataObject) -> Unit
+) {
+    val auth = remember {
+        Firebase.auth
+    }
+
+    val errorState = remember {
+        mutableStateOf("")
+    }
 
     val emailState = remember { mutableStateOf("") }
     val passwordState = remember { mutableStateOf("") }
@@ -86,14 +96,100 @@ fun LoginScreen() {
             },
             label = "Password"
         )
-        Spacer(modifier = Modifier.height(15.dp))
+        Spacer(modifier = Modifier.height(10.dp))
+        if (errorState.value.isNotEmpty()) {
+            Text(
+                text = errorState.value,
+                color = Color.Red,
+                textAlign = TextAlign.Center
+            )
+        }
         LoginButton(
             text = "Sign In",
-            onClick = {}
+            onClick = {
+                signIn(
+                    auth = auth,
+                    email = emailState.value,
+                    passworrd = passwordState.value,
+                    onSignInSuccess = { navData ->
+                        onNavigateToMainScreen(navData)
+                    },
+                    onSignInFailure = { error ->
+                        errorState.value = error
+                    }
+                )
+            }
         )
         LoginButton(
             text = "Sign Up",
-            onClick = {}
+            onClick = {
+                signUp(
+                    auth = auth,
+                    email = emailState.value,
+                    passworrd = passwordState.value,
+                    onSignUpSuccess = { navData ->
+                        onNavigateToMainScreen(navData)
+
+                    },
+                    onSignUpFailure = { error ->
+                        errorState.value = error
+                    }
+                )
+            }
         )
     }
+}
+
+fun signUp(
+    auth: FirebaseAuth,
+    email: String,
+    passworrd: String,
+    onSignUpSuccess: (MainScreenDataObject) -> Unit,
+    onSignUpFailure: (String) -> Unit
+) {
+    if (email.isBlank() || passworrd.isBlank()) {
+        onSignUpFailure("Email and password cannot be empty")
+
+        return
+    }
+
+    auth.createUserWithEmailAndPassword(email, passworrd)
+        .addOnCompleteListener { task ->
+            if (task.isSuccessful) onSignUpSuccess(
+                MainScreenDataObject(
+                    uid = task.result.user?.uid!!,
+                    email = task.result.user?.email!!
+                )
+            )
+        }
+        .addOnFailureListener {
+            onSignUpFailure(it.message ?: "Sign Up Error")
+        }
+}
+
+fun signIn(
+    auth: FirebaseAuth,
+    email: String,
+    passworrd: String,
+    onSignInSuccess: (MainScreenDataObject) -> Unit,
+    onSignInFailure: (String) -> Unit
+) {
+    if (email.isBlank() || passworrd.isBlank()) {
+        onSignInFailure("Email and password cannot be empty")
+
+        return
+    }
+
+    auth.signInWithEmailAndPassword(email, passworrd)
+        .addOnCompleteListener { task ->
+            if (task.isSuccessful) onSignInSuccess(
+                MainScreenDataObject(
+                    uid = task.result.user?.uid!!,
+                    email = task.result.user?.email!!
+                )
+            )
+        }
+        .addOnFailureListener {
+            onSignInFailure(it.message ?: "Sign In Error")
+        }
 }
