@@ -1,0 +1,6 @@
+package ru.ar4uk.bookstoreapp.ui.add_book_screen.data
+
+import kotlinx.serialization.Serializable
+
+@Serializable
+object AddScreenObject
