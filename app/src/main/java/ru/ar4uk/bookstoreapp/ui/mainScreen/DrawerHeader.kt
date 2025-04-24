@@ -21,7 +21,7 @@ import ru.ar4uk.bookstoreapp.R
 import ru.ar4uk.bookstoreapp.ui.theme.DarkBlue
 
 @Composable
-fun DrawerHeader() {
+fun DrawerHeader(email: String) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -41,6 +41,11 @@ fun DrawerHeader() {
             color = Color.White,
             fontSize = 22.sp,
             fontWeight = FontWeight.Bold
+        )
+        Text(
+            text = email,
+            color = Color.Gray,
+            fontSize = 16.sp
         )
     }
 }

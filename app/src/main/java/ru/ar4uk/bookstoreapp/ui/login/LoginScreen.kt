@@ -42,8 +42,8 @@ fun LoginScreen(
         mutableStateOf("")
     }
 
-    val emailState = remember { mutableStateOf("") }
-    val passwordState = remember { mutableStateOf("") }
+    val emailState = remember { mutableStateOf("ml_serg@mail.ru") }
+    val passwordState = remember { mutableStateOf("123456") }
 
     Image(
         modifier = Modifier
