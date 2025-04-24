@@ -19,6 +19,9 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -27,6 +30,9 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.google.firebase.Firebase
+import com.google.firebase.auth.auth
+import com.google.firebase.firestore.firestore
 import ru.ar4uk.bookstoreapp.R
 import ru.ar4uk.bookstoreapp.ui.theme.DarkBlue
 import ru.ar4uk.bookstoreapp.ui.theme.DarkTransparentBlue
@@ -34,6 +40,15 @@ import ru.ar4uk.bookstoreapp.ui.theme.GrayLight
 
 @Composable
 fun DrawerBody() {
+
+    val isAdminState = remember { mutableStateOf(false) }
+
+    LaunchedEffect(Unit) {
+        isAdmin { isAdmin ->
+            isAdminState.value = isAdmin
+        }
+    }
+
     val categoriesList = listOf(
         "Favorites",
         "Fantasy",
@@ -96,20 +111,31 @@ fun DrawerBody() {
                     }
                 }
             }
-            Button(
-                onClick = {},
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(5.dp),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = DarkTransparentBlue
-                )
-            ) {
-                Text(
-                    text = "Admin Panel"
-                )
+            if (isAdminState.value) {
+                Button(
+                    onClick = {},
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(5.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = DarkTransparentBlue
+                    )
+                ) {
+                    Text(
+                        text = "Admin Panel"
+                    )
+                }
             }
+
         }
     }
+}
 
+fun isAdmin(onAdmin: (Boolean) -> Unit) {
+    val uid = Firebase.auth.currentUser!!.uid
+
+    Firebase.firestore.collection("admin")
+        .document(uid).get().addOnSuccessListener {
+            onAdmin(it.get("isAdmin") as Boolean)
+        }
 }
