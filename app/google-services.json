@@ -1,13 +1,33 @@
 {
   "project_info": {
-    "project_number": "475778099116",
-    "project_id": "bookstore-b23da",
-    "storage_bucket": "bookstore-b23da.firebasestorage.app"
+    "project_number": "969750039725",
+    "firebase_url": "https://onlineshopcoffee-53ab2-default-rtdb.firebaseio.com",
+    "project_id": "onlineshopcoffee-53ab2",
+    "storage_bucket": "onlineshopcoffee-53ab2.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:475778099116:android:d7b38b3b0cab70371d3c09",
+        "mobilesdk_app_id": "1:969750039725:android:7168b5d58a8ca2e8b54a24",
+        "android_client_info": {
+          "package_name": "com.ar4uk.onlineshopcoffee"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD9SE9zkuvrJ3t-xEKy78DhL7AoefiyjLg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:969750039725:android:62af8c631a22ff1db54a24",
         "android_client_info": {
           "package_name": "ru.ar4uk.bookstoreapp"
         }
@@ -15,7 +35,7 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyC6Ayt4BN8xqdEb9TMaE8oZjY-40IhImIE"
+          "current_key": "AIzaSyD9SE9zkuvrJ3t-xEKy78DhL7AoefiyjLg"
         }
       ],
       "services": {

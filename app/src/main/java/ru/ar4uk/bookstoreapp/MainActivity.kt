@@ -25,7 +25,7 @@ class MainActivity : ComponentActivity() {
 
             NavHost(
                 navController = navController,
-                startDestination = AddScreenObject
+                startDestination = LoginScreenObject
             ) {
                 composable<LoginScreenObject> {
                     LoginScreen(
@@ -37,7 +37,9 @@ class MainActivity : ComponentActivity() {
                 composable<MainScreenDataObject> { navEntry ->
                     val navData = navEntry.toRoute<MainScreenDataObject>()
 
-                    MainScreen(navData)
+                    MainScreen(navData) {
+                        navController.navigate(AddScreenObject)
+                    }
                 }
 
                 composable<AddScreenObject> {

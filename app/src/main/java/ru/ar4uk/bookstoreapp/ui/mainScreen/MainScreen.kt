@@ -15,7 +15,10 @@ import ru.ar4uk.bookstoreapp.ui.mainScreen.bottom_menu.BottomMenu
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun MainScreen(navData: MainScreenDataObject) {
+fun MainScreen(
+    navData: MainScreenDataObject,
+    onAdminClick: () -> Unit
+) {
     val drawerState = rememberDrawerState(DrawerValue.Closed)
 
     ModalNavigationDrawer(
@@ -24,7 +27,9 @@ fun MainScreen(navData: MainScreenDataObject) {
         drawerContent = {
             Column(modifier = Modifier.fillMaxWidth(0.7f)) {
                 DrawerHeader(navData.email)
-                DrawerBody()
+                DrawerBody {
+                    onAdminClick()
+                }
             }
         }
     ) {
