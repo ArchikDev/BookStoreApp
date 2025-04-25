@@ -43,7 +43,9 @@ class MainActivity : ComponentActivity() {
                 }
 
                 composable<AddScreenObject> {
-                    AddBookScreen()
+                    AddBookScreen {
+                        navController.popBackStack()
+                    }
                 }
             }
         }

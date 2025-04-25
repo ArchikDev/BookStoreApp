@@ -40,7 +40,9 @@ import ru.ar4uk.bookstoreapp.ui.login.RoundedCornerTextField
 import ru.ar4uk.bookstoreapp.ui.theme.BoxFilterColor
 
 @Composable
-fun AddBookScreen() {
+fun AddBookScreen(
+    onSaved: () -> Unit = {}
+) {
     var selectedCategory = "Bestsellers"
     val title = remember { mutableStateOf("") }
     val description = remember { mutableStateOf("") }
@@ -147,7 +149,7 @@ fun AddBookScreen() {
                         imageUrl = price.value,
                     ),
                     onSaved = {
-
+                        onSaved()
                     },
                     onError = {}
                 )
