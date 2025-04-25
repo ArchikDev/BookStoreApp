@@ -69,4 +69,6 @@ dependencies {
     implementation(libs.androidx.navigation.runtime.ktx)
     // serialization
     implementation(libs.serialization.json)
+    // coil
+    implementation(libs.coil.compose)
 }

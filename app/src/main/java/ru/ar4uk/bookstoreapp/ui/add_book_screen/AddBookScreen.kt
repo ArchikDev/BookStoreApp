@@ -1,5 +1,8 @@
 package ru.ar4uk.bookstoreapp.ui.add_book_screen
 
+import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -23,6 +26,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil.compose.rememberAsyncImagePainter
 import ru.ar4uk.bookstoreapp.R
 import ru.ar4uk.bookstoreapp.ui.login.LoginButton
 import ru.ar4uk.bookstoreapp.ui.login.RoundedCornerTextField
@@ -34,10 +38,19 @@ fun AddBookScreen() {
     val description = remember { mutableStateOf("") }
     val price = remember { mutableStateOf("") }
 
+    val selectedImageUri = remember { mutableStateOf<Uri?>(null) }
+
+    val imageLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+    ) { uri ->
+        selectedImageUri.value = uri
+    }
+
+
     Image(
         modifier = Modifier
             .fillMaxSize(),
-        painter = painterResource(id = R.drawable.book_store_bg),
+        painter = rememberAsyncImagePainter(model = selectedImageUri.value),
         contentDescription = null,
         contentScale = ContentScale.Crop,
         alpha = 0.4f
@@ -101,6 +114,7 @@ fun AddBookScreen() {
         LoginButton(
             text = "Select image",
             onClick = {
+                imageLauncher.launch("image/*")
             }
         )
         LoginButton(
