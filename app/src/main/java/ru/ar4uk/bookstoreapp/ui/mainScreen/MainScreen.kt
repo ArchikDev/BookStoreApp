@@ -48,7 +48,7 @@ fun MainScreen(
 
     LaunchedEffect(Unit) {
         getAllFavsIds(db, navData.uid) { favs ->
-            getAllBooks(db, favs) { books ->
+            getAllBooks(db, favs, "Fantasy") { books ->
                 booksListState.value = books
             }
         }
@@ -80,6 +80,16 @@ fun MainScreen(
                         coroutineScope.launch {
                             drawerState.close()
                         }
+                    },
+                    onCategoryClick = { category ->
+                        getAllFavsIds(db, navData.uid) { favs ->
+                            getAllBooks(db, favs, category) { books ->
+                                booksListState.value = books
+                            }
+                        }
+                        coroutineScope.launch {
+                            drawerState.close()
+                        }
                     }
                 )
             }
@@ -97,7 +107,7 @@ fun MainScreen(
                 },
                 onHomeClick = {
                     getAllFavsIds(db, navData.uid) { favs ->
-                        getAllBooks(db, favs) { books ->
+                        getAllBooks(db, favs, "Fantasy") { books ->
                             booksListState.value = books
                         }
                     }
@@ -143,9 +153,11 @@ fun MainScreen(
 private fun getAllBooks(
     db: FirebaseFirestore,
     idsList: List<String>,
+    category: String,
     onBooks: (List<Book>) -> Unit
 ) {
     db.collection("books")
+        .whereEqualTo("category", category)
         .get()
         .addOnSuccessListener { task ->
             val booksList = task.toObjects(Book::class.java).map {

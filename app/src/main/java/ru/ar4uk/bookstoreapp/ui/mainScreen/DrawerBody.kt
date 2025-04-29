@@ -42,7 +42,8 @@ import ru.ar4uk.bookstoreapp.ui.theme.GrayLight
 fun DrawerBody(
     onAdmin: (Boolean) -> Unit,
     onAdminClick: () -> Unit,
-    onFavsClick: () -> Unit = {}
+    onFavsClick: () -> Unit = {},
+    onCategoryClick: (String) -> Unit = {}
 ) {
 
     val isAdminState = remember { mutableStateOf(false) }
@@ -96,7 +97,11 @@ fun DrawerBody(
                     Column(modifier = Modifier
                         .fillMaxWidth()
                         .clickable {
-                            onFavsClick()
+                            if (categoriesList[0] == item) {
+                                onFavsClick()
+                            } else {
+                                onCategoryClick(item)
+                            }
                         }
                     ) {
                         Spacer(modifier = Modifier.height(12.dp))
