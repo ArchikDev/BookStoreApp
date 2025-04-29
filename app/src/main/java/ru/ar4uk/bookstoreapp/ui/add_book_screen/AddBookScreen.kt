@@ -45,16 +45,20 @@ fun AddBookScreen(
     navData: AddScreenObject = AddScreenObject(),
     onSaved: () -> Unit = {}
 ) {
-    var selectedCategory = navData.category
+    var selectedCategory =  remember { mutableStateOf(navData.category) }
     val title = remember { mutableStateOf(navData.title) }
     val description = remember { mutableStateOf(navData.description) }
     val price = remember { mutableStateOf(navData.price) }
 
     val selectedImageUri = remember { mutableStateOf<Uri?>(null) }
+    val navImageUrl = remember {
+        mutableStateOf(navData.imageUrl)
+    }
 
     val imageLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
     ) { uri ->
+        navImageUrl.value = ""
         selectedImageUri.value = uri
     }
 
@@ -65,7 +69,9 @@ fun AddBookScreen(
     Image(
         modifier = Modifier
             .fillMaxSize(),
-        painter = rememberAsyncImagePainter(model = selectedImageUri.value),
+        painter = rememberAsyncImagePainter(
+            model = navImageUrl.value.ifEmpty {  selectedImageUri.value }
+        ),
         contentDescription = null,
         contentScale = ContentScale.Crop,
         alpha = 0.4f
@@ -99,8 +105,8 @@ fun AddBookScreen(
             color = Color.White
         )
         Spacer(modifier = Modifier.height(15.dp))
-        RoundedCornerDropDownMenu { selectedItem ->
-            selectedCategory = selectedItem
+        RoundedCornerDropDownMenu(selectedCategory.value) { selectedItem ->
+            selectedCategory.value = selectedItem
         }
         Spacer(modifier = Modifier.height(15.dp))
         RoundedCornerTextField(
@@ -139,22 +145,39 @@ fun AddBookScreen(
         LoginButton(
             text = "Save",
             onClick = {
-                saveBookImage(
-                    selectedImageUri.value!!,
-                    storage,
-                    firestore,
-                    Book(
-                        title = title.value,
-                        description = description.value,
-                        price = price.value,
-                        category = selectedCategory,
-                        imageUrl = price.value,
-                    ),
-                    onSaved = {
-                        onSaved()
-                    },
-                    onError = {}
+                val book = Book(
+                    id = navData.id,
+                    title = title.value,
+                    description = description.value,
+                    price = price.value,
+                    category = selectedCategory.value,
+                    imageUrl = (selectedImageUri.value ?: navData.imageUrl).toString(),
                 )
+
+                if (selectedImageUri.value != null) {
+                    saveBookImage(
+                        navData.imageUrl,
+                        selectedImageUri.value!!,
+                        storage,
+                        firestore,
+                        book,
+                        onSaved = {
+                            onSaved()
+                        },
+                        onError = {}
+                    )
+                } else {
+                    saveBookToFireStore(
+                        firestore,
+                        book.copy(imageUrl = navData.imageUrl),
+                        onSaved = {
+                            onSaved()
+                        },
+                        onError = {}
+                    )
+                }
+
+
             }
         )
 
@@ -162,6 +185,7 @@ fun AddBookScreen(
 }
 
 private fun saveBookImage(
+    oldImageUrl: String,
     uri: Uri,
     storage: FirebaseStorage,
     firestore: FirebaseFirestore,
@@ -170,16 +194,20 @@ private fun saveBookImage(
     onError: () -> Unit
 ) {
     val timeStamp = System.currentTimeMillis()
-    val storageRef = storage.reference
-        .child("book_images")
-        .child("image_$timeStamp.jpg")
+
+    val storageRef = if (oldImageUrl.isEmpty()) {
+        storage.reference
+            .child("book_images")
+            .child("image_$timeStamp.jpg")
+    } else {
+        storage.getReferenceFromUrl(oldImageUrl)
+    }
     val uploadTask = storageRef.putFile(uri)
 
     uploadTask.addOnSuccessListener {
         storageRef.downloadUrl.addOnSuccessListener { url ->
             saveBookToFireStore(
                 firestore = firestore,
-                url = url.toString(),
                 book = book,
                 onSaved = {
                     onSaved()
@@ -195,17 +223,16 @@ private fun saveBookImage(
 
 private fun saveBookToFireStore(
     firestore: FirebaseFirestore,
-    url: String,
     book: Book,
     onSaved: () -> Unit,
     onError: () -> Unit
 ) {
     val db = firestore.collection("books")
-    val id = db.document().id
+    val id = book.id.ifEmpty { db.document().id }
 
     db.document(id)
         .set(
-            book.copy(id = id, imageUrl = url)
+            book.copy(id = id)
         )
         .addOnSuccessListener {
             onSaved()
