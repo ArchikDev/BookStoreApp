@@ -41,7 +41,8 @@ import ru.ar4uk.bookstoreapp.ui.theme.GrayLight
 @Composable
 fun DrawerBody(
     onAdmin: (Boolean) -> Unit,
-    onAdminClick: () -> Unit
+    onAdminClick: () -> Unit,
+    onFavsClick: () -> Unit = {}
 ) {
 
     val isAdminState = remember { mutableStateOf(false) }
@@ -94,7 +95,9 @@ fun DrawerBody(
                 items(categoriesList) { item ->
                     Column(modifier = Modifier
                         .fillMaxWidth()
-                        .clickable {}
+                        .clickable {
+                            onFavsClick()
+                        }
                     ) {
                         Spacer(modifier = Modifier.height(12.dp))
                         Text(
