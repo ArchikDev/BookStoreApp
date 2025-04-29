@@ -40,6 +40,7 @@ import ru.ar4uk.bookstoreapp.ui.theme.GrayLight
 
 @Composable
 fun DrawerBody(
+    onAdmin: (Boolean) -> Unit,
     onAdminClick: () -> Unit
 ) {
 
@@ -48,6 +49,7 @@ fun DrawerBody(
     LaunchedEffect(Unit) {
         isAdmin { isAdmin ->
             isAdminState.value = isAdmin
+            onAdmin(isAdmin)
         }
     }
 

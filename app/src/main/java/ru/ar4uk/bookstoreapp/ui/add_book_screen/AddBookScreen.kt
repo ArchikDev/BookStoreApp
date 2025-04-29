@@ -35,18 +35,20 @@ import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.ktx.storage
 import ru.ar4uk.bookstoreapp.R
 import ru.ar4uk.bookstoreapp.data.Book
+import ru.ar4uk.bookstoreapp.ui.add_book_screen.data.AddScreenObject
 import ru.ar4uk.bookstoreapp.ui.login.LoginButton
 import ru.ar4uk.bookstoreapp.ui.login.RoundedCornerTextField
 import ru.ar4uk.bookstoreapp.ui.theme.BoxFilterColor
 
 @Composable
 fun AddBookScreen(
+    navData: AddScreenObject = AddScreenObject(),
     onSaved: () -> Unit = {}
 ) {
-    var selectedCategory = "Bestsellers"
-    val title = remember { mutableStateOf("") }
-    val description = remember { mutableStateOf("") }
-    val price = remember { mutableStateOf("") }
+    var selectedCategory = navData.category
+    val title = remember { mutableStateOf(navData.title) }
+    val description = remember { mutableStateOf(navData.description) }
+    val price = remember { mutableStateOf(navData.price) }
 
     val selectedImageUri = remember { mutableStateOf<Uri?>(null) }
 
