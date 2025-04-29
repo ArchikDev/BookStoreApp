@@ -24,6 +24,7 @@ import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.launch
 import ru.ar4uk.bookstoreapp.data.Book
+import ru.ar4uk.bookstoreapp.data.Favorite
 import ru.ar4uk.bookstoreapp.ui.login.data.MainScreenDataObject
 import ru.ar4uk.bookstoreapp.ui.mainScreen.bottom_menu.BottomMenu
 
@@ -42,12 +43,15 @@ fun MainScreen(
         mutableStateOf(false)
     }
 
-    LaunchedEffect(Unit) {
-        val db = Firebase.firestore
+    val db = remember { Firebase.firestore }
 
-        getAllBooks(db = db) { books ->
-            booksListState.value = books
+    LaunchedEffect(Unit) {
+        getAllFavsIds(db, navData.uid) { favs ->
+            getAllBooks(db, favs) { books ->
+                booksListState.value = books
+            }
         }
+
     }
 
     ModalNavigationDrawer(
@@ -80,23 +84,98 @@ fun MainScreen(
                     .padding(paddingValues)
             ) {
                 items(booksListState.value) { book ->
-                    BookListItemUi(isAdminState.value, book) {book ->
-                        onBookEditClick(book)
-                    }
+                    BookListItemUi(
+                        isAdminState.value,
+                        book,
+                        onEditClick = { book ->
+                            onBookEditClick(book)
+                        },
+                        onFavoriteClick = {
+                            booksListState.value = booksListState.value.map {
+                                if (it.id == book.id) {
+                                    onFavs(
+                                        db,
+                                        navData.uid,
+                                        Favorite(it.id),
+                                        !it.isFavorite
+                                    )
+                                    it.copy(isFavorite = !it.isFavorite)
+                                } else {
+                                    it
+                                }
+                            }
+                        }
+                    )
                 }
             }
         }
     }
 }
 
+
 private fun getAllBooks(
     db: FirebaseFirestore,
+    idsList: List<String>,
     onBooks: (List<Book>) -> Unit
 ) {
     db.collection("books")
         .get()
         .addOnSuccessListener { task ->
-            onBooks(task.toObjects(Book::class.java))
+            val booksList = task.toObjects(Book::class.java).map {
+                if (idsList.contains(it.id)) {
+                    it.copy(isFavorite = true)
+                } else {
+                    it
+                }
+            }
+
+            onBooks(booksList)
         }
         .addOnFailureListener {  }
+}
+
+private fun getAllFavsIds(
+    db: FirebaseFirestore,
+    uid: String,
+    onFavs: (List<String>) -> Unit
+) {
+    db.collection("users")
+        .document(uid)
+        .collection("favorites")
+        .get()
+        .addOnSuccessListener { task ->
+            val idsList = task.toObjects(Favorite::class.java)
+            val keysList = arrayListOf<String>()
+            idsList.forEach {
+                keysList.add(it.id)
+            }
+            onFavs(keysList)
+        }
+        .addOnFailureListener {  }
+}
+
+private fun onFavs(
+    db: FirebaseFirestore,
+    uid: String,
+    favorite: Favorite,
+    isFav: Boolean
+) {
+    if (isFav) {
+        db.collection("users")
+            .document(uid)
+            .collection("favorites")
+            .document(favorite.id)
+            .set(favorite)
+            .addOnSuccessListener { }
+            .addOnFailureListener { }
+    } else {
+        db.collection("users")
+            .document(uid)
+            .collection("favorites")
+            .document(favorite.id)
+            .delete()
+            .addOnSuccessListener { }
+            .addOnFailureListener { }
+    }
+
 }

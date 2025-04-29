@@ -10,6 +10,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
@@ -31,7 +33,8 @@ import ru.ar4uk.bookstoreapp.data.Book
 fun BookListItemUi(
     showEditButton: Boolean = false,
     book: Book,
-    onEditClick: (Book) -> Unit = {}
+    onEditClick: (Book) -> Unit = {},
+    onFavoriteClick: () -> Unit
 ) {
     Column(modifier = Modifier
         .fillMaxWidth()
@@ -80,6 +83,14 @@ fun BookListItemUi(
                 }) {
                     Icon(Icons.Default.Edit, contentDescription = "")
                 }
+            }
+            IconButton(onClick = {
+                onFavoriteClick()
+            }) {
+                Icon(
+                    if (book.isFavorite) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
+                    contentDescription = ""
+                )
             }
         }
 
