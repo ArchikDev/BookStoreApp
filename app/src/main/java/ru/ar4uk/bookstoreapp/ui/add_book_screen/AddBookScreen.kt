@@ -150,8 +150,7 @@ fun AddBookScreen(
                     title = title.value,
                     description = description.value,
                     price = price.value,
-                    category = selectedCategory.value,
-                    imageUrl = (selectedImageUri.value ?: navData.imageUrl).toString(),
+                    category = selectedCategory.value
                 )
 
                 if (selectedImageUri.value != null) {
@@ -208,7 +207,7 @@ private fun saveBookImage(
         storageRef.downloadUrl.addOnSuccessListener { url ->
             saveBookToFireStore(
                 firestore = firestore,
-                book = book,
+                book = book.copy(imageUrl = url.toString()),
                 onSaved = {
                     onSaved()
                 },
