@@ -16,9 +16,10 @@ navigationRuntimeKtx = "2.8.9"
 serializationVersion = "2.0.0"
 serializationKotlin = "1.7.1"
 coilCompose = "2.5.0"
-hiltCompiler = "2.52"
+hiltCompiler = "2.53.1"
 hiltAndroid = "2.53.1"
 google-ksp = "2.1.0-1.0.29"
+hiltNavigationCompose = "1.2.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -46,6 +47,7 @@ serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-jso
 coil-compose = { module = "io.coil-kt:coil-compose", version.ref = "coilCompose" }
 hilt-compiler = { module = "com.google.dagger:hilt-compiler", version.ref = "hiltCompiler" }
 hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "hiltAndroid" }
+hilt-navigation-compose = { module = "androidx.hilt:hilt-navigation-compose", version.ref = "hiltNavigationCompose" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

@@ -8,6 +8,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
+import dagger.hilt.android.AndroidEntryPoint
 import ru.ar4uk.bookstoreapp.ui.add_book_screen.AddBookScreen
 import ru.ar4uk.bookstoreapp.ui.add_book_screen.data.AddScreenObject
 import ru.ar4uk.bookstoreapp.ui.detail_screen.data.DetailsNavObject
@@ -17,6 +18,7 @@ import ru.ar4uk.bookstoreapp.ui.login.data.LoginScreenObject
 import ru.ar4uk.bookstoreapp.ui.login.data.MainScreenDataObject
 import ru.ar4uk.bookstoreapp.ui.mainScreen.MainScreen
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
