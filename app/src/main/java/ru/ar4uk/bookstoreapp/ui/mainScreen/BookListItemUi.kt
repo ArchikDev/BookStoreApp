@@ -1,5 +1,6 @@
 package ru.ar4uk.bookstoreapp.ui.mainScreen
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -34,11 +35,15 @@ fun BookListItemUi(
     showEditButton: Boolean = false,
     book: Book,
     onEditClick: (Book) -> Unit = {},
-    onFavoriteClick: () -> Unit
+    onFavoriteClick: () -> Unit,
+    onBookClick: (Book) -> Unit
 ) {
     Column(modifier = Modifier
         .fillMaxWidth()
         .padding(16.dp)
+        .clickable {
+            onBookClick(book)
+        }
     ) {
         AsyncImage(
             model = book.imageUrl,

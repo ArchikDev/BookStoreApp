@@ -11,6 +11,7 @@ import androidx.compose.ui.res.painterResource
 
 @Composable
 fun BottomMenu(
+    selectedItem: String,
     onHomeClick: () -> Unit = {},
     onFavsClick: () -> Unit = {},
     onSettingsClick: () -> Unit = {}
@@ -21,15 +22,11 @@ fun BottomMenu(
         BottomMenuItem.Settings
     )
 
-    val seletedItem = remember { mutableStateOf("Home") }
-
     NavigationBar {
         items.forEach { item ->
             NavigationBarItem(
-                selected = seletedItem.value == item.title,
+                selected = selectedItem == item.title,
                 onClick = {
-                    seletedItem.value = item.title
-
                     when(item.title) {
                         BottomMenuItem.Home.title -> onHomeClick()
                         BottomMenuItem.Favs.title -> onFavsClick()

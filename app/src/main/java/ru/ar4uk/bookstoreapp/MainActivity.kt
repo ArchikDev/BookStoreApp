@@ -10,6 +10,8 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import ru.ar4uk.bookstoreapp.ui.add_book_screen.AddBookScreen
 import ru.ar4uk.bookstoreapp.ui.add_book_screen.data.AddScreenObject
+import ru.ar4uk.bookstoreapp.ui.detail_screen.data.DetailsNavObject
+import ru.ar4uk.bookstoreapp.ui.detail_screen.ui.DetailsScreen
 import ru.ar4uk.bookstoreapp.ui.login.LoginScreen
 import ru.ar4uk.bookstoreapp.ui.login.data.LoginScreenObject
 import ru.ar4uk.bookstoreapp.ui.login.data.MainScreenDataObject
@@ -48,10 +50,20 @@ class MainActivity : ComponentActivity() {
                                 category = book.category,
                                 imageUrl = book.imageUrl
                             ))
+                        },
+                        onBookClick = { bk ->
+                            navController.navigate(DetailsNavObject(
+                                title = bk.title,
+                                description = bk.description,
+                                imageUrl = bk.imageUrl,
+                                price = bk.price,
+                                category = bk.category,
+                            ))
+                        },
+                        onAdminClick = {
+                            navController.navigate(AddScreenObject())
                         }
-                    ) {
-                        navController.navigate(AddScreenObject())
-                    }
+                    )
                 }
 
                 composable<AddScreenObject> { navEntry->
@@ -60,6 +72,13 @@ class MainActivity : ComponentActivity() {
                     AddBookScreen(navData) {
                         navController.popBackStack()
                     }
+                }
+                composable<DetailsNavObject> { navEntry->
+                    val navData = navEntry.toRoute<DetailsNavObject>()
+
+                    DetailsScreen(
+                        navData
+                    )
                 }
             }
         }
