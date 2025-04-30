@@ -5,4 +5,6 @@ plugins {
     alias(libs.plugins.kotlin.compose) apply false
     alias(libs.plugins.gms) apply false
     alias(libs.plugins.plugin.serialization) apply false
+    alias(libs.plugins.hilt.android) apply false
+    alias(libs.plugins.google.ksp) apply false
 }

@@ -4,6 +4,8 @@ plugins {
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.gms)
     alias(libs.plugins.plugin.serialization)
+    alias(libs.plugins.hilt.android)
+    alias(libs.plugins.google.ksp)
 }
 
 android {
@@ -71,4 +73,8 @@ dependencies {
     implementation(libs.serialization.json)
     // coil
     implementation(libs.coil.compose)
+    // dagger hilt
+    implementation(libs.hilt.android)
+    ksp(libs.hilt.compiler)
+
 }
