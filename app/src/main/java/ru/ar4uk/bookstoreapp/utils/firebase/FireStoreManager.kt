@@ -1,6 +1,5 @@
 package ru.ar4uk.bookstoreapp.utils.firebase
 
-import android.util.Log
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.FieldPath
@@ -10,7 +9,7 @@ import ru.ar4uk.bookstoreapp.data.Favorite
 import javax.inject.Singleton
 
 @Singleton
-class FirebaseManager(
+class FireStoreManager(
     private val auth: FirebaseAuth,
     private val db: FirebaseFirestore
 ) {

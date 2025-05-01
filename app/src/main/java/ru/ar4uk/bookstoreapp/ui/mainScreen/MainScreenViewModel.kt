@@ -1,33 +1,31 @@
 package ru.ar4uk.bookstoreapp.ui.mainScreen
 
 
-import android.util.Log
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.lifecycle.ViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import ru.ar4uk.bookstoreapp.data.Book
 import ru.ar4uk.bookstoreapp.ui.mainScreen.bottom_menu.BottomMenuItem
-import ru.ar4uk.bookstoreapp.utils.firebase.FirebaseManager
+import ru.ar4uk.bookstoreapp.utils.firebase.FireStoreManager
 import javax.inject.Inject
 
 @HiltViewModel
 class MainScreenViewModel @Inject constructor(
-    private val firebaseManager: FirebaseManager
+    private val fireStoreManager: FireStoreManager
 ): ViewModel() {
     val booksListState = mutableStateOf(emptyList<Book>())
     val isFavListEmptyState = mutableStateOf(false)
     val selectedBottomItemState = mutableStateOf(BottomMenuItem.Home.title)
 
     fun getAllBooks() {
-        firebaseManager.getAllBooks { books ->
+        fireStoreManager.getAllBooks { books ->
             booksListState.value = books
             isFavListEmptyState.value = books.isEmpty()
         }
     }
 
     fun getAllFavsBooks() {
-        firebaseManager.getAllFavsBooks { books ->
+        fireStoreManager.getAllFavsBooks { books ->
             booksListState.value = books
             isFavListEmptyState.value = books.isEmpty()
         }
@@ -39,14 +37,14 @@ class MainScreenViewModel @Inject constructor(
             return
         }
 
-        firebaseManager.getAllBooksFromCategory(category) { books->
+        fireStoreManager.getAllBooksFromCategory(category) { books->
             booksListState.value = books
             isFavListEmptyState.value = books.isEmpty()
         }
     }
 
     fun onFavClick(book: Book, isFavState: String) {
-        val booksList = firebaseManager.changeFavState(booksListState.value, book)
+        val booksList = fireStoreManager.changeFavState(booksListState.value, book)
         booksListState.value = if (isFavState == BottomMenuItem.Favs.title) {
             booksList.filter { it.isFavorite }
         } else {

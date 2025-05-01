@@ -23,6 +23,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
@@ -32,6 +33,7 @@ import ru.ar4uk.bookstoreapp.ui.theme.BoxFilterColor
 
 @Composable
 fun LoginScreen(
+    viewModel: LoginViewModel = hiltViewModel(),
     onNavigateToMainScreen: (MainScreenDataObject) -> Unit
 ) {
     val auth = remember {
@@ -91,6 +93,7 @@ fun LoginScreen(
         Spacer(modifier = Modifier.height(15.dp))
         RoundedCornerTextField(
             text = passwordState.value,
+            isPassword = true,
             onValueChange = {
                 passwordState.value = it
             },
