@@ -21,6 +21,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.google.firebase.firestore.FieldPath
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.firestore
@@ -34,6 +35,7 @@ import ru.ar4uk.bookstoreapp.ui.mainScreen.bottom_menu.BottomMenuItem
 
 @Composable
 fun MainScreen(
+    viewModel: MainScreenViewModel = hiltViewModel(),
     navData: MainScreenDataObject,
     onBookEditClick: (Book) -> Unit,
     onAdminClick: () -> Unit,
@@ -41,28 +43,17 @@ fun MainScreen(
 ) {
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val coroutineScope = rememberCoroutineScope()
-    val booksListState = remember {
-        mutableStateOf(emptyList<Book>())
-    }
+
     val isAdminState = remember {
         mutableStateOf(false)
     }
-    val isFavListEmptyState = remember {
-        mutableStateOf(false)
-    }
+
     val selectedBottomItemState = remember {
         mutableStateOf(BottomMenuItem.Home.title)
     }
 
-    val db = remember { Firebase.firestore }
-
     LaunchedEffect(Unit) {
-        getAllFavsIds(db, navData.uid) { favs ->
-            getAllBooks(db, favs) { books ->
-                isFavListEmptyState.value = books.isEmpty()
-                booksListState.value = books
-            }
-        }
+        viewModel.getAllBooks()
     }
 
     ModalNavigationDrawer(
@@ -84,29 +75,16 @@ fun MainScreen(
                     onFavsClick = {
                         selectedBottomItemState.value = BottomMenuItem.Favs.title
 
-                        getAllFavsIds(db, navData.uid) { favs ->
-                            getAllFavsBooks(db, favs) { books ->
-                                isFavListEmptyState.value = books.isEmpty()
-                                booksListState.value = books
-                            }
-                        }
+                        viewModel.getAllFavsBooks()
+
                         coroutineScope.launch {
                             drawerState.close()
                         }
                     },
                     onCategoryClick = { category ->
-                        getAllFavsIds(db, navData.uid) { favs ->
-                            if (category == "All") {
-                                getAllBooks(db, favs) { books ->
-                                    booksListState.value = books
-                                }
-                            } else {
-                                getAllBooksFromCategory(db, favs, category) { books ->
-                                    booksListState.value = books
-                                }
-                            }
+                        viewModel.getBooksFromCategory(category)
+                        selectedBottomItemState.value = BottomMenuItem.Home.title
 
-                        }
                         coroutineScope.launch {
                             drawerState.close()
                         }
@@ -122,22 +100,12 @@ fun MainScreen(
                 onFavsClick = {
                     selectedBottomItemState.value = BottomMenuItem.Favs.title
 
-                    getAllFavsIds(db, navData.uid) { favs ->
-                        getAllFavsBooks(db, favs) { books ->
-                            isFavListEmptyState.value = books.isEmpty()
-                            booksListState.value = books
-                        }
-                    }
+                    viewModel.getAllFavsBooks()
                 },
                 onHomeClick = {
                     selectedBottomItemState.value = BottomMenuItem.Home.title
 
-                    getAllFavsIds(db, navData.uid) { favs ->
-                        getAllBooks(db, favs) { books ->
-                            isFavListEmptyState.value = books.isEmpty()
-                            booksListState.value = books
-                        }
-                    }
+                    viewModel.getAllBooks()
                 },
                 onSettingsClick = {
                     selectedBottomItemState.value = BottomMenuItem.Settings.title
@@ -145,7 +113,7 @@ fun MainScreen(
             ) }
         ) { paddingValues ->
 
-            if (isFavListEmptyState.value) {
+            if (viewModel.isFavListEmptyState.value) {
                 Box(
                     modifier = Modifier.fillMaxSize(),
                     contentAlignment = Alignment.Center
@@ -164,31 +132,18 @@ fun MainScreen(
                     .fillMaxSize()
                     .padding(paddingValues)
             ) {
-                items(booksListState.value) { book ->
+                items(viewModel.booksListState.value) { book ->
                     BookListItemUi(
                         isAdminState.value,
                         book,
-                        onEditClick = { book ->
-                            onBookEditClick(book)
+                        onEditClick = { bk ->
+                            onBookEditClick(bk)
                         },
                         onFavoriteClick = {
-                            booksListState.value = booksListState.value.map {
-                                if (it.id == book.id) {
-                                    onFavs(
-                                        db,
-                                        navData.uid,
-                                        Favorite(it.id),
-                                        !it.isFavorite
-                                    )
-                                    it.copy(isFavorite = !it.isFavorite)
-                                } else {
-                                    it
-                                }
-                            }
-                            if (selectedBottomItemState.value == BottomMenuItem.Favs.title) {
-                                booksListState.value = booksListState.value.filter { it.isFavorite }
-                            }
-
+                            viewModel.onFavClick(
+                                book,
+                                selectedBottomItemState.value
+                            )
                         },
                         onBookClick = { bk ->
                             onBookClick(bk)

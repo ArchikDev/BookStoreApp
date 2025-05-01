@@ -1,5 +1,6 @@
 package ru.ar4uk.bookstoreapp.utils.firebase
 
+import android.util.Log
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.FieldPath
@@ -29,7 +30,7 @@ class FirebaseManager(
             .addOnFailureListener {  }
     }
 
-    private fun getAllFavsBooks(
+    fun getAllFavsBooks(
         onBooks: (List<Book>) -> Unit
     ) {
         getAllFavsIds { idsList->
@@ -55,31 +56,28 @@ class FirebaseManager(
         }
     }
 
-    private fun getAllBooks(
+    fun getAllBooks(
         onBooks: (List<Book>) -> Unit
     ) {
         getAllFavsIds { idsList->
-            if (idsList.isNotEmpty()) {
-                db.collection("books")
-                    .get()
-                    .addOnSuccessListener { task ->
-                        val booksList = task.toObjects(Book::class.java).map {
-                            if (idsList.contains(it.id)) {
-                                it.copy(isFavorite = true)
-                            } else {
-                                it
-                            }
+            db.collection("books")
+                .get()
+                .addOnSuccessListener { task ->
+                    val booksList = task.toObjects(Book::class.java).map {
+                        if (idsList.contains(it.id)) {
+                            it.copy(isFavorite = true)
+                        } else {
+                            it
                         }
-
-                        onBooks(booksList)
                     }
-                    .addOnFailureListener {  }
-            }
-        }
 
+                    onBooks(booksList)
+                }
+                .addOnFailureListener {  }
+        }
     }
 
-    private fun getAllBooksFromCategory(
+    fun getAllBooksFromCategory(
         category: String,
         onBooks: (List<Book>) -> Unit
     ) {
@@ -103,7 +101,7 @@ class FirebaseManager(
 
     }
 
-    private fun onFavs(
+    fun onFavs(
         favorite: Favorite,
         isFav: Boolean
     ) {
@@ -122,6 +120,20 @@ class FirebaseManager(
                 .addOnFailureListener { }
         }
 
+    }
+
+    fun changeFavState(books: List<Book>, book: Book): List<Book> {
+        return books.map {
+            if (it.id == book.id) {
+                onFavs(
+                    Favorite(it.id),
+                    !it.isFavorite
+                )
+                it.copy(isFavorite = !it.isFavorite)
+            } else {
+                it
+            }
+        }
     }
 
     private fun getFavsCategoryReference(): CollectionReference {

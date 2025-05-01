@@ -42,7 +42,7 @@ class MainActivity : ComponentActivity() {
                     val navData = navEntry.toRoute<MainScreenDataObject>()
 
                     MainScreen(
-                        navData,
+                        navData = navData,
                         onBookEditClick = { book ->
                             navController.navigate(AddScreenObject(
                                 id = book.id,
