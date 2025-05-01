@@ -48,12 +48,11 @@ fun MainScreen(
         mutableStateOf(false)
     }
 
-    val selectedBottomItemState = remember {
-        mutableStateOf(BottomMenuItem.Home.title)
-    }
-
     LaunchedEffect(Unit) {
-        viewModel.getAllBooks()
+        if (viewModel.booksListState.value.isEmpty()) {
+            viewModel.getAllBooks()
+        }
+
     }
 
     ModalNavigationDrawer(
@@ -73,7 +72,7 @@ fun MainScreen(
                         onAdminClick()
                     },
                     onFavsClick = {
-                        selectedBottomItemState.value = BottomMenuItem.Favs.title
+                        viewModel.selectedBottomItemState.value = BottomMenuItem.Favs.title
 
                         viewModel.getAllFavsBooks()
 
@@ -83,7 +82,7 @@ fun MainScreen(
                     },
                     onCategoryClick = { category ->
                         viewModel.getBooksFromCategory(category)
-                        selectedBottomItemState.value = BottomMenuItem.Home.title
+                        viewModel.selectedBottomItemState.value = BottomMenuItem.Home.title
 
                         coroutineScope.launch {
                             drawerState.close()
@@ -96,19 +95,19 @@ fun MainScreen(
         Scaffold(
             modifier = Modifier.fillMaxSize(),
             bottomBar = { BottomMenu(
-                selectedBottomItemState.value,
+                viewModel.selectedBottomItemState.value,
                 onFavsClick = {
-                    selectedBottomItemState.value = BottomMenuItem.Favs.title
+                    viewModel.selectedBottomItemState.value = BottomMenuItem.Favs.title
 
                     viewModel.getAllFavsBooks()
                 },
                 onHomeClick = {
-                    selectedBottomItemState.value = BottomMenuItem.Home.title
+                    viewModel.selectedBottomItemState.value = BottomMenuItem.Home.title
 
                     viewModel.getAllBooks()
                 },
                 onSettingsClick = {
-                    selectedBottomItemState.value = BottomMenuItem.Settings.title
+                    viewModel.selectedBottomItemState.value = BottomMenuItem.Settings.title
                 },
             ) }
         ) { paddingValues ->
@@ -142,7 +141,7 @@ fun MainScreen(
                         onFavoriteClick = {
                             viewModel.onFavClick(
                                 book,
-                                selectedBottomItemState.value
+                                viewModel.selectedBottomItemState.value
                             )
                         },
                         onBookClick = { bk ->

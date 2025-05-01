@@ -17,6 +17,7 @@ class MainScreenViewModel @Inject constructor(
 ): ViewModel() {
     val booksListState = mutableStateOf(emptyList<Book>())
     val isFavListEmptyState = mutableStateOf(false)
+    val selectedBottomItemState = mutableStateOf(BottomMenuItem.Home.title)
 
     fun getAllBooks() {
         firebaseManager.getAllBooks { books ->
