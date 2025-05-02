@@ -1,7 +1,10 @@
 package ru.ar4uk.bookstoreapp.ui.login
 
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
+import com.google.firebase.auth.FirebaseUser
 import dagger.hilt.android.lifecycle.HiltViewModel
+import ru.ar4uk.bookstoreapp.ui.login.data.MainScreenDataObject
 import ru.ar4uk.bookstoreapp.utils.firebase.AuthManager
 import javax.inject.Inject
 
@@ -9,5 +12,49 @@ import javax.inject.Inject
 class LoginViewModel @Inject constructor(
     private val authManager: AuthManager
 ): ViewModel() {
+    val errorState =  mutableStateOf("")
+
+    val emailState = mutableStateOf("ml_serg@mail.ru")
+    val passwordState = mutableStateOf("123456")
+
+    val currentUser = mutableStateOf<FirebaseUser?>(null)
+
+    fun signIn(
+        onSignInSuccess: (MainScreenDataObject) -> Unit
+    ) {
+        authManager.signIn(
+            emailState.value,
+            passwordState.value,
+            onSignInSuccess = { navData ->
+                onSignInSuccess(navData)
+            },
+            onSignInFailure = { error ->
+                errorState.value = error
+            }
+        )
+    }
+
+    fun signUp(
+        onSignUpSuccess: (MainScreenDataObject) -> Unit
+    ) {
+        authManager.signUp(
+            emailState.value,
+            passwordState.value,
+            onSignUpSuccess = { navData ->
+                onSignUpSuccess(navData)
+            },
+            onSignUpFailure = { error ->
+                errorState.value = error
+            }
+        )
+    }
+
+    fun getAccountState() {
+        currentUser.value = authManager.getCurrentUser()
+    }
+    fun signOut() {
+        authManager.signOut()
+        currentUser.value = null
+    }
 
 }
