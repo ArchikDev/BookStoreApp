@@ -2,6 +2,7 @@ package ru.ar4uk.bookstoreapp.ui.login
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -81,16 +82,19 @@ fun LoginScreen(
                 },
                 label = "Email"
             )
-            Spacer(modifier = Modifier.height(15.dp))
-            RoundedCornerTextField(
-                text = viewModel.passwordState.value,
-                isPassword = true,
-                onValueChange = {
-                    viewModel.passwordState.value = it
-                },
-                label = "Password"
-            )
             Spacer(modifier = Modifier.height(10.dp))
+            if (!viewModel.resetPasswordState.value) {
+                RoundedCornerTextField(
+                    text = viewModel.passwordState.value,
+                    isPassword = true,
+                    onValueChange = {
+                        viewModel.passwordState.value = it
+                    },
+                    label = "Password"
+                )
+                Spacer(modifier = Modifier.height(10.dp))
+            }
+
             if (viewModel.errorState.value.isNotEmpty()) {
                 Text(
                     text = viewModel.errorState.value,
@@ -98,18 +102,21 @@ fun LoginScreen(
                     textAlign = TextAlign.Center
                 )
             }
+            if (!viewModel.resetPasswordState.value) {
+                LoginButton(
+                    text = "Sign In",
+                    onClick = {
+                        viewModel.signIn(
+                            onSignInSuccess = { navData ->
+                                onNavigateToMainScreen(navData)
+                            }
+                        )
+                    }
+                )
+            }
+
             LoginButton(
-                text = "Sign In",
-                onClick = {
-                    viewModel.signIn(
-                        onSignInSuccess = { navData ->
-                            onNavigateToMainScreen(navData)
-                        }
-                    )
-                }
-            )
-            LoginButton(
-                text = "Sign Up",
+                text = if (viewModel.resetPasswordState.value) "Reset Password" else "Sign Up",
                 onClick = {
                     viewModel.signUp(
                         onSignUpSuccess = { navData ->
@@ -118,6 +125,18 @@ fun LoginScreen(
                     )
                 }
             )
+            Spacer(modifier = Modifier.height(16.dp))
+            if (!viewModel.resetPasswordState.value) {
+                Text(
+                    text = "Forget password?",
+                    color = Color.White,
+                    modifier = Modifier
+                        .clickable {
+                            viewModel.errorState.value = ""
+                            viewModel.resetPasswordState.value = true
+                        }
+                )
+            }
         } else {
             LoginButton(
                 text = "Enter",

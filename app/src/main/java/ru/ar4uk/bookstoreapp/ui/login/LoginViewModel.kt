@@ -17,11 +17,14 @@ class LoginViewModel @Inject constructor(
     val emailState = mutableStateOf("ml_serg@mail.ru")
     val passwordState = mutableStateOf("123456")
 
+    val resetPasswordState = mutableStateOf(false)
+
     val currentUser = mutableStateOf<FirebaseUser?>(null)
 
     fun signIn(
         onSignInSuccess: (MainScreenDataObject) -> Unit
     ) {
+        errorState.value = ""
         authManager.signIn(
             emailState.value,
             passwordState.value,
@@ -37,21 +40,37 @@ class LoginViewModel @Inject constructor(
     fun signUp(
         onSignUpSuccess: (MainScreenDataObject) -> Unit
     ) {
-        authManager.signUp(
-            emailState.value,
-            passwordState.value,
-            onSignUpSuccess = { navData ->
-                onSignUpSuccess(navData)
-            },
-            onSignUpFailure = { error ->
-                errorState.value = error
-            }
-        )
+        errorState.value = ""
+        if (resetPasswordState.value) {
+            authManager.resetPassword(
+                emailState.value,
+                onResetPasswordSuccess = {
+                    resetPasswordState.value = false
+                    errorState.value = "Password reset email sent"
+                },
+                onResetPasswordFailure = { errorMessage ->
+                    errorState.value = errorMessage
+                }
+            )
+        } else {
+            authManager.signUp(
+                emailState.value,
+                passwordState.value,
+                onSignUpSuccess = { navData ->
+                    onSignUpSuccess(navData)
+                },
+                onSignUpFailure = { error ->
+                    errorState.value = error
+                }
+            )
+        }
+
     }
 
     fun getAccountState() {
         currentUser.value = authManager.getCurrentUser()
     }
+
     fun signOut() {
         authManager.signOut()
         currentUser.value = null

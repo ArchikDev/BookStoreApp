@@ -61,6 +61,28 @@ class AuthManager(
             }
     }
 
+    fun resetPassword(
+        email: String,
+        onResetPasswordSuccess: () -> Unit,
+        onResetPasswordFailure: (String) -> Unit
+    ) {
+        if (email.isEmpty()) {
+            onResetPasswordFailure("Email cannot be empty")
+
+            return
+        }
+
+        auth.sendPasswordResetEmail(email)
+            .addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    onResetPasswordSuccess()
+                }
+            }
+            .addOnFailureListener { result ->
+                onResetPasswordFailure(result.message ?: "Reset Password Error")
+            }
+    }
+
     fun getCurrentUser(): FirebaseUser? {
         return auth.currentUser
     }
