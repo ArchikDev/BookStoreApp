@@ -21,6 +21,8 @@ class LoginViewModel @Inject constructor(
 
     val currentUser = mutableStateOf<FirebaseUser?>(null)
 
+    val showResetPasswordDialog = mutableStateOf(false)
+
     fun signIn(
         onSignInSuccess: (MainScreenDataObject) -> Unit
     ) {
@@ -46,7 +48,7 @@ class LoginViewModel @Inject constructor(
                 emailState.value,
                 onResetPasswordSuccess = {
                     resetPasswordState.value = false
-                    errorState.value = "Password reset email sent"
+                    showResetPasswordDialog.value = true
                 },
                 onResetPasswordFailure = { errorMessage ->
                     errorState.value = errorMessage

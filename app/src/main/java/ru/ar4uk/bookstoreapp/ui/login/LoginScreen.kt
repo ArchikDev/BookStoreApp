@@ -19,12 +19,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.google.firebase.auth.ktx.auth
 import ru.ar4uk.bookstoreapp.R
+import ru.ar4uk.bookstoreapp.custom.MyDialog
 import ru.ar4uk.bookstoreapp.ui.login.data.MainScreenDataObject
 import ru.ar4uk.bookstoreapp.ui.theme.BoxFilterColor
 
@@ -156,6 +158,16 @@ fun LoginScreen(
                 }
             )
         }
+        MyDialog(
+            showDialog = viewModel.showResetPasswordDialog.value,
+            onDismiss = {
+                viewModel.showResetPasswordDialog.value = false
+            },
+            onConfirm = {
+                viewModel.showResetPasswordDialog.value = false
+            },
+            message = stringResource(R.string.reset_password_message)
+        )
     }
 }
 

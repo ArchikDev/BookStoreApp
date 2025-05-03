@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">BookStoreApp</string>
+    <string name="reset_password_message">Reset password link was sent to your email. Please follow the instructions to reset password.</string>
 </resources>
