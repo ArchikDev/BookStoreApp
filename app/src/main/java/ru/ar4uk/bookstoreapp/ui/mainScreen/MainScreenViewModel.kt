@@ -52,4 +52,17 @@ class MainScreenViewModel @Inject constructor(
         }
         isFavListEmptyState.value = booksListState.value.isEmpty()
     }
+
+    fun deleteBook(
+        book: Book
+    ) {
+        fireStoreManager.deleteBook(
+            book,
+            onDeleted = {
+                booksListState.value = booksListState.value.filter {
+                    it.id != book.id
+                }
+            }
+        )
+    }
 }

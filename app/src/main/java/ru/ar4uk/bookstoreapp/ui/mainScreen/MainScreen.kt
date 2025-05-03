@@ -146,6 +146,9 @@ fun MainScreen(
                         },
                         onBookClick = { bk ->
                             onBookClick(bk)
+                        },
+                        onDeleteClick = { bkToDelete ->
+                            viewModel.deleteBook(bkToDelete)
                         }
                     )
                 }

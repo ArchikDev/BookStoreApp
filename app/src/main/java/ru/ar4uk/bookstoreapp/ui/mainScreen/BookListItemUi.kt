@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
@@ -36,7 +37,8 @@ fun BookListItemUi(
     book: Book,
     onEditClick: (Book) -> Unit = {},
     onFavoriteClick: () -> Unit,
-    onBookClick: (Book) -> Unit
+    onBookClick: (Book) -> Unit,
+    onDeleteClick: (Book) -> Unit,
 ) {
     Column(modifier = Modifier
         .fillMaxWidth()
@@ -80,15 +82,10 @@ fun BookListItemUi(
                 color = Color.Blue,
                 fontWeight = FontWeight.Bold,
                 fontSize = 18.sp,
-                modifier = Modifier.fillMaxWidth().weight(1f)
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f)
             )
-            if (showEditButton) {
-                IconButton(onClick = {
-                    onEditClick(book)
-                }) {
-                    Icon(Icons.Default.Edit, contentDescription = "")
-                }
-            }
             IconButton(onClick = {
                 onFavoriteClick()
             }) {
@@ -96,6 +93,24 @@ fun BookListItemUi(
                     if (book.isFavorite) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
                     contentDescription = ""
                 )
+            }
+        }
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.End
+        ) {
+            if (showEditButton) {
+                IconButton(onClick = {
+                    onEditClick(book)
+                }) {
+                    Icon(Icons.Default.Edit, contentDescription = "")
+                }
+                IconButton (onClick = {
+                    onDeleteClick(book)
+                }) {
+                    Icon(Icons.Default.Delete, contentDescription = "")
+                }
             }
         }
 

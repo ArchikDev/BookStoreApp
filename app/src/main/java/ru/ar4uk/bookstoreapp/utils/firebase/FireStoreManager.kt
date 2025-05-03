@@ -140,4 +140,19 @@ class FireStoreManager(
             .document(auth.uid ?: "")
             .collection("favorites")
     }
+
+    fun deleteBook(
+        book: Book,
+        onDeleted: () -> Unit
+    ) {
+        db.collection("books")
+            .document(book.id)
+            .delete()
+            .addOnSuccessListener {
+                onDeleted()
+            }
+            .addOnFailureListener {
+
+            }
+    }
 }
