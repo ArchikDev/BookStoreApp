@@ -28,6 +28,13 @@ fun MyDialog(
                         text = confirmButtonText
                     )
                 }
+                Button(onClick = {
+                    onDismiss()
+                }) {
+                    Text(
+                        text = "Cancel"
+                    )
+                }
             },
             title = {
                 Text(

@@ -14,7 +14,8 @@ class FireStoreManager(
     private val db: FirebaseFirestore
 ) {
     private fun getAllFavsIds(
-        onFavs: (List<String>) -> Unit
+        onFavs: (List<String>) -> Unit,
+        onFailure: (String) -> Unit
     ) {
         getFavsCategoryReference()
             .get()
@@ -26,16 +27,52 @@ class FireStoreManager(
                 }
                 onFavs(keysList)
             }
-            .addOnFailureListener {  }
+            .addOnFailureListener {
+                onFailure(it.message ?: "Error")
+            }
     }
 
     fun getAllFavsBooks(
-        onBooks: (List<Book>) -> Unit
+        onBooks: (List<Book>) -> Unit,
+        onFailure: (String) -> Unit
     ) {
-        getAllFavsIds { idsList->
-            if (idsList.isNotEmpty()) {
+        getAllFavsIds(
+            onFavs = { idsList->
+                if (idsList.isNotEmpty()) {
+                    db.collection("books")
+                        .whereIn(FieldPath.documentId(), idsList)
+                        .get()
+                        .addOnSuccessListener { task ->
+                            val booksList = task.toObjects(Book::class.java).map {
+                                if (idsList.contains(it.id)) {
+                                    it.copy(isFavorite = true)
+                                } else {
+                                    it
+                                }
+                            }
+
+                            onBooks(booksList)
+                        }
+                        .addOnFailureListener {
+                            onFailure(it.message ?: "Error")
+                        }
+                } else {
+                    onBooks(emptyList())
+                }
+            },
+            onFailure = {
+                onFailure(it)
+            }
+        )
+    }
+
+    fun getAllBooks(
+        onBooks: (List<Book>) -> Unit,
+        onFailure: (String) -> Unit
+    ) {
+        getAllFavsIds(
+            onFavs = { idsList->
                 db.collection("books")
-                    .whereIn(FieldPath.documentId(), idsList)
                     .get()
                     .addOnSuccessListener { task ->
                         val booksList = task.toObjects(Book::class.java).map {
@@ -48,55 +85,45 @@ class FireStoreManager(
 
                         onBooks(booksList)
                     }
-                    .addOnFailureListener {  }
-            } else {
-                onBooks(emptyList())
-            }
-        }
-    }
-
-    fun getAllBooks(
-        onBooks: (List<Book>) -> Unit
-    ) {
-        getAllFavsIds { idsList->
-            db.collection("books")
-                .get()
-                .addOnSuccessListener { task ->
-                    val booksList = task.toObjects(Book::class.java).map {
-                        if (idsList.contains(it.id)) {
-                            it.copy(isFavorite = true)
-                        } else {
-                            it
-                        }
+                    .addOnFailureListener {
+                        onFailure(it.message ?: "Error")
                     }
-
-                    onBooks(booksList)
-                }
-                .addOnFailureListener {  }
-        }
+            },
+            onFailure = {
+                onFailure(it)
+            }
+        )
     }
 
     fun getAllBooksFromCategory(
         category: String,
-        onBooks: (List<Book>) -> Unit
+        onBooks: (List<Book>) -> Unit,
+        onFailure: (String) -> Unit
     ) {
-        getAllFavsIds { idsList->
-            db.collection("books")
-                .whereEqualTo("category", category)
-                .get()
-                .addOnSuccessListener { task ->
-                    val booksList = task.toObjects(Book::class.java).map {
-                        if (idsList.contains(it.id)) {
-                            it.copy(isFavorite = true)
-                        } else {
-                            it
+        getAllFavsIds(
+            onFavs = { idsList->
+                db.collection("books")
+                    .whereEqualTo("category", category)
+                    .get()
+                    .addOnSuccessListener { task ->
+                        val booksList = task.toObjects(Book::class.java).map {
+                            if (idsList.contains(it.id)) {
+                                it.copy(isFavorite = true)
+                            } else {
+                                it
+                            }
                         }
-                    }
 
-                    onBooks(booksList)
-                }
-                .addOnFailureListener {  }
-        }
+                        onBooks(booksList)
+                    }
+                    .addOnFailureListener {
+                        onFailure(it.message ?: "Error")
+                    }
+            },
+            onFailure = {
+                onFailure(it)
+            }
+        )
 
     }
 
@@ -111,12 +138,14 @@ class FireStoreManager(
             favsDocRef
                 .set(favorite)
                 .addOnSuccessListener { }
-                .addOnFailureListener { }
+                .addOnFailureListener {
+                }
         } else {
             favsDocRef
                 .delete()
                 .addOnSuccessListener { }
-                .addOnFailureListener { }
+                .addOnFailureListener {
+                }
         }
 
     }
@@ -143,7 +172,8 @@ class FireStoreManager(
 
     fun deleteBook(
         book: Book,
-        onDeleted: () -> Unit
+        onDeleted: () -> Unit,
+        onFailure: (String) -> Unit
     ) {
         db.collection("books")
             .document(book.id)
@@ -152,7 +182,7 @@ class FireStoreManager(
                 onDeleted()
             }
             .addOnFailureListener {
-
+                onFailure(it.message ?: "Error")
             }
     }
 }
