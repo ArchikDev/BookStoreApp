@@ -6,16 +6,18 @@ import com.google.firebase.auth.FirebaseUser
 import dagger.hilt.android.lifecycle.HiltViewModel
 import ru.ar4uk.bookstoreapp.ui.login.data.MainScreenDataObject
 import ru.ar4uk.bookstoreapp.utils.firebase.AuthManager
+import ru.ar4uk.bookstoreapp.utils.store.StoreManager
 import javax.inject.Inject
 
 @HiltViewModel
 class LoginViewModel @Inject constructor(
-    private val authManager: AuthManager
+    private val authManager: AuthManager,
+    private val storeManager: StoreManager
 ): ViewModel() {
     val errorState =  mutableStateOf("")
 
-    val emailState = mutableStateOf("ml_serg@mail.ru")
-    val passwordState = mutableStateOf("123456")
+    val emailState = mutableStateOf("")
+    val passwordState = mutableStateOf("")
 
     val resetPasswordState = mutableStateOf(false)
 
@@ -67,6 +69,17 @@ class LoginViewModel @Inject constructor(
             )
         }
 
+    }
+
+    fun saveLastEmail() {
+        storeManager.saveString(
+            StoreManager.EMAIL_KEY,
+            emailState.value
+        )
+    }
+
+    fun getEmail() {
+        emailState.value = storeManager.getString(StoreManager.EMAIL_KEY, "")
     }
 
     fun getAccountState() {
