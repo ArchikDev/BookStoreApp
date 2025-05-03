@@ -38,6 +38,7 @@ import ru.ar4uk.bookstoreapp.data.Favorite
 import ru.ar4uk.bookstoreapp.ui.login.data.MainScreenDataObject
 import ru.ar4uk.bookstoreapp.ui.mainScreen.bottom_menu.BottomMenu
 import ru.ar4uk.bookstoreapp.ui.mainScreen.bottom_menu.BottomMenuItem
+import ru.ar4uk.bookstoreapp.ui.mainScreen.top_app_bar.MainTopBar
 
 @Composable
 fun MainScreen(
@@ -121,6 +122,9 @@ fun MainScreen(
         }
     ) {
         Scaffold(
+            topBar = {
+                MainTopBar()
+            },
             modifier = Modifier.fillMaxSize(),
             bottomBar = { BottomMenu(
                 viewModel.selectedBottomItemState.value,
