@@ -49,7 +49,7 @@ class MainActivity : ComponentActivity() {
                                 title = book.title,
                                 description = book.description,
                                 price = book.price,
-                                categoryIndex = book.categoryIndex,
+                                categoryIndex = book.category,
                                 imageUrl = book.imageUrl
                             ))
                         },
@@ -59,7 +59,7 @@ class MainActivity : ComponentActivity() {
                                 description = bk.description,
                                 imageUrl = bk.imageUrl,
                                 price = bk.price,
-                                categoryIndex = bk.categoryIndex,
+                                categoryIndex = bk.category,
                             ))
                         },
                         onAdminClick = {
@@ -71,9 +71,12 @@ class MainActivity : ComponentActivity() {
                 composable<AddScreenObject> { navEntry->
                     val navData = navEntry.toRoute<AddScreenObject>()
 
-                    AddBookScreen(navData) {
-                        navController.popBackStack()
-                    }
+                    AddBookScreen(
+                        navData,
+                        onSaved = {
+                            navController.popBackStack()
+                        }
+                    )
                 }
                 composable<DetailsNavObject> { navEntry->
                     val navData = navEntry.toRoute<DetailsNavObject>()

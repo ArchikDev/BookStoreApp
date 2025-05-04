@@ -44,7 +44,7 @@ fun MainScreen(
     onBookClick: (Book) -> Unit
 ) {
     val showLoadIndicator = remember {
-        mutableStateOf(true)
+        mutableStateOf(false)
     }
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val coroutineScope = rememberCoroutineScope()
@@ -59,6 +59,7 @@ fun MainScreen(
     LaunchedEffect(Unit) {
         if (viewModel.booksListState.value.isEmpty()) {
             viewModel.getAllBooks()
+            showLoadIndicator.value = true
         }
 
         viewModel.uiState.collect { state ->
@@ -94,9 +95,10 @@ fun MainScreen(
                             drawerState.close()
                         }
                         onAdminClick()
+                        viewModel.booksListState.value = emptyList()
                     },
                     onFavsClick = {
-                        viewModel.selectedBottomItemState.value = BottomMenuItem.Favs.titleId
+                        viewModel.selectedBottomItemState.intValue = BottomMenuItem.Favs.titleId
 
                         viewModel.getAllFavsBooks()
 
@@ -106,7 +108,7 @@ fun MainScreen(
                     },
                     onCategoryClick = { categoryIndex ->
                         viewModel.getBooksFromCategory(categoryIndex)
-                        viewModel.selectedBottomItemState.value = BottomMenuItem.Home.titleId
+                        viewModel.selectedBottomItemState.intValue = BottomMenuItem.Home.titleId
 
                         coroutineScope.launch {
                             drawerState.close()
@@ -127,19 +129,19 @@ fun MainScreen(
             },
             modifier = Modifier.fillMaxSize(),
             bottomBar = { BottomMenu(
-                viewModel.selectedBottomItemState.value,
+                viewModel.selectedBottomItemState.intValue,
                 onFavsClick = {
-                    viewModel.selectedBottomItemState.value = BottomMenuItem.Favs.titleId
+                    viewModel.selectedBottomItemState.intValue = BottomMenuItem.Favs.titleId
 
                     viewModel.getAllFavsBooks()
                 },
                 onHomeClick = {
-                    viewModel.selectedBottomItemState.value = BottomMenuItem.Home.titleId
+                    viewModel.selectedBottomItemState.intValue = BottomMenuItem.Home.titleId
 
                     viewModel.getAllBooks()
                 },
                 onSettingsClick = {
-                    viewModel.selectedBottomItemState.value = BottomMenuItem.Settings.titleId
+                    viewModel.selectedBottomItemState.intValue = BottomMenuItem.Settings.titleId
                 },
             ) }
         ) { paddingValues ->
@@ -194,11 +196,12 @@ fun MainScreen(
                         book,
                         onEditClick = { bk ->
                             onBookEditClick(bk)
+                            viewModel.booksListState.value = emptyList()
                         },
                         onFavoriteClick = {
                             viewModel.onFavClick(
                                 book,
-                                viewModel.selectedBottomItemState.value
+                                viewModel.selectedBottomItemState.intValue
                             )
                         },
                         onBookClick = { bk ->

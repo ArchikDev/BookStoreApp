@@ -17,21 +17,24 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.unit.dp
+import ru.ar4uk.bookstoreapp.R
+import ru.ar4uk.bookstoreapp.ui.mainScreen.utils.Categories
 import ru.ar4uk.bookstoreapp.ui.theme.ButtonColor
 
 @Composable
 fun RoundedCornerDropDownMenu(
-    defCategory: String,
-    onOptionSelected: (String) -> Unit
+    defCategory: Int,
+    onOptionSelected: (Int) -> Unit
 ) {
     val expanded = remember { mutableStateOf(false) }
-    val selectedOption = remember { mutableStateOf(defCategory) }
-    val categoriesList = listOf(
-        "Fantasy",
-        "Drama",
-        "Bestsellers"
-    )
+    val categoriesList = stringArrayResource(R.array.category_array)
+    val selectedOption = remember {
+        mutableStateOf(categoriesList[Categories.FANTASY])
+    }
+
+    selectedOption.value = categoriesList[defCategory]
 
     Box(
         modifier = Modifier
@@ -57,17 +60,17 @@ fun RoundedCornerDropDownMenu(
                 expanded.value = false
             }
         ) {
-            categoriesList.forEach { option ->
+            categoriesList.forEachIndexed { index, title ->
                 DropdownMenuItem(
                     text = {
                         Text(
-                            text = option
+                            text = title
                         )
                     },
                     onClick = {
-                        selectedOption.value = option
+                        selectedOption.value = title
                         expanded.value = false
-                        onOptionSelected(option)
+                        onOptionSelected(index)
                     }
                 )
             }

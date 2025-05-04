@@ -6,6 +6,8 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.auth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.firestore
+import com.google.firebase.storage.FirebaseStorage
+import com.google.firebase.storage.storage
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -33,11 +35,18 @@ object MainModule {
 
     @Provides
     @Singleton
+    fun provideFirebaseFireStorage(): FirebaseStorage {
+        return Firebase.storage
+    }
+
+    @Provides
+    @Singleton
     fun provideFirebaseManager(
         auth: FirebaseAuth,
-        db: FirebaseFirestore
+        db: FirebaseFirestore,
+        storage: FirebaseStorage,
     ): FireStoreManager {
-        return FireStoreManager(auth, db)
+        return FireStoreManager(auth, db, storage)
     }
 
     @Provides

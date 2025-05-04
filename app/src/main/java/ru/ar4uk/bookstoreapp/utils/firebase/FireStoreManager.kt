@@ -1,9 +1,11 @@
 package ru.ar4uk.bookstoreapp.utils.firebase
 
+import android.net.Uri
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.FieldPath
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.storage.FirebaseStorage
 import ru.ar4uk.bookstoreapp.data.Book
 import ru.ar4uk.bookstoreapp.data.Favorite
 import javax.inject.Singleton
@@ -11,7 +13,8 @@ import javax.inject.Singleton
 @Singleton
 class FireStoreManager(
     private val auth: FirebaseAuth,
-    private val db: FirebaseFirestore
+    private val db: FirebaseFirestore,
+    private val storage: FirebaseStorage,
 ) {
     private fun getAllFavsIds(
         onFavs: (List<String>) -> Unit,
@@ -184,5 +187,73 @@ class FireStoreManager(
             .addOnFailureListener {
                 onFailure(it.message ?: "Error")
             }
+    }
+
+    private fun saveBookToFireStore(
+        book: Book,
+        onSaved: () -> Unit,
+        onError: (String) -> Unit
+    ) {
+        val db = db.collection("books")
+        val id = book.id.ifEmpty { db.document().id }
+
+        db.document(id)
+            .set(
+                book.copy(id = id)
+            )
+            .addOnSuccessListener {
+                onSaved()
+            }
+            .addOnFailureListener { exception ->
+                onError(exception.message ?: "Error")
+            }
+    }
+
+    fun saveBookImage(
+        oldImageUrl: String,
+        uri: Uri?,
+        book: Book,
+        onSaved: () -> Unit,
+        onError: (String) -> Unit
+    ) {
+        val timeStamp = System.currentTimeMillis()
+
+        val storageRef = if (oldImageUrl.isEmpty()) {
+            storage.reference
+                .child("book_images")
+                .child("image_$timeStamp.jpg")
+        } else {
+            storage.getReferenceFromUrl(oldImageUrl)
+        }
+        if (uri == null) {
+            saveBookToFireStore(
+                book = book.copy(imageUrl = oldImageUrl),
+                onSaved = {
+                    onSaved()
+                },
+                onError = {
+                    onError(it)
+                }
+            )
+
+            return
+        }
+
+        val uploadTask = storageRef.putFile(uri)
+
+        uploadTask.addOnSuccessListener {
+            storageRef.downloadUrl.addOnSuccessListener { url ->
+                saveBookToFireStore(
+                    book = book.copy(imageUrl = url.toString()),
+                    onSaved = {
+                        onSaved()
+                    },
+                    onError = {
+                        onError(it)
+                    }
+                )
+            }
+        }
+
     }
 }
