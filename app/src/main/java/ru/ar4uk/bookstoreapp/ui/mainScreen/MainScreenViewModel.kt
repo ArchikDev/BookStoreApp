@@ -1,6 +1,7 @@
 package ru.ar4uk.bookstoreapp.ui.mainScreen
 
 
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -10,6 +11,8 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
 import ru.ar4uk.bookstoreapp.data.Book
 import ru.ar4uk.bookstoreapp.ui.mainScreen.bottom_menu.BottomMenuItem
+import ru.ar4uk.bookstoreapp.ui.mainScreen.utils.Categories.ALL
+import ru.ar4uk.bookstoreapp.ui.mainScreen.utils.Categories.FAVORITES
 import ru.ar4uk.bookstoreapp.utils.firebase.FireStoreManager
 import javax.inject.Inject
 
@@ -19,8 +22,8 @@ class MainScreenViewModel @Inject constructor(
 ): ViewModel() {
     val booksListState = mutableStateOf(emptyList<Book>())
     val isFavListEmptyState = mutableStateOf(false)
-    val selectedBottomItemState = mutableStateOf(BottomMenuItem.Home.titleId)
-    val categoryState = mutableStateOf("All")
+    val selectedBottomItemState = mutableIntStateOf(BottomMenuItem.Home.titleId)
+    val categoryState = mutableIntStateOf(ALL)
     var bookToDelete: Book? = null
 
     private val _uiState = MutableSharedFlow<MainUiState>()
@@ -33,7 +36,7 @@ class MainScreenViewModel @Inject constructor(
     }
 
     fun getAllBooks() {
-        categoryState.value = "All"
+        categoryState.intValue = ALL
         sendUiState(MainUiState.Loading)
 
         fireStoreManager.getAllBooks(
@@ -49,7 +52,7 @@ class MainScreenViewModel @Inject constructor(
     }
 
     fun getAllFavsBooks() {
-        categoryState.value = "Favorites"
+        categoryState.intValue = FAVORITES
         sendUiState(MainUiState.Loading)
 
         fireStoreManager.getAllFavsBooks(
@@ -65,18 +68,13 @@ class MainScreenViewModel @Inject constructor(
         )
     }
 
-    fun getBooksFromCategory(category: String) {
-        if (category == "All") {
-            getAllBooks()
-            return
-        }
-
-        categoryState.value = category
+    fun getBooksFromCategory(categoryIndex: Int) {
+        categoryState.intValue = categoryIndex
 
         sendUiState(MainUiState.Loading)
 
         fireStoreManager.getAllBooksFromCategory(
-            category,
+            categoryIndex,
             onBooks = { books->
                 booksListState.value = books
                 isFavListEmptyState.value = books.isEmpty()

@@ -1,6 +1,5 @@
 package ru.ar4uk.bookstoreapp.ui.mainScreen.top_app_bar
 
-import android.icu.text.CaseMap
 import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -17,7 +16,6 @@ import androidx.compose.material3.SearchBarDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarColors
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -25,15 +23,18 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringArrayResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import ru.ar4uk.bookstoreapp.R
+import ru.ar4uk.bookstoreapp.ui.mainScreen.utils.Categories
 import ru.ar4uk.bookstoreapp.ui.theme.DarkBlue
-import ru.ar4uk.bookstoreapp.ui.theme.Purple80
 import ru.ar4uk.bookstoreapp.ui.theme.PurpleGrey80
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainTopBar(
-    title: String
+    titleIndex: Int
 ) {
     var targetState by remember {
         mutableStateOf(false)
@@ -108,7 +109,13 @@ fun MainTopBar(
             TopAppBar(
                 title = {
                     Text(
-                        text = title
+                        text = if (titleIndex == Categories.FAVORITES) {
+                            stringResource(id = R.string.favs)
+                        } else if(titleIndex == Categories.ALL){
+                            stringResource(id = R.string.all)
+                        } else {
+                            stringArrayResource(id=R.array.category_array)[titleIndex]
+                        }
                     )
                 },
                 actions = {

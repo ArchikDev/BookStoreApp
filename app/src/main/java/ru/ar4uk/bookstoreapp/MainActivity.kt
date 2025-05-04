@@ -49,7 +49,7 @@ class MainActivity : ComponentActivity() {
                                 title = book.title,
                                 description = book.description,
                                 price = book.price,
-                                category = book.category,
+                                categoryIndex = book.categoryIndex,
                                 imageUrl = book.imageUrl
                             ))
                         },
@@ -59,7 +59,7 @@ class MainActivity : ComponentActivity() {
                                 description = bk.description,
                                 imageUrl = bk.imageUrl,
                                 price = bk.price,
-                                category = bk.category,
+                                categoryIndex = bk.categoryIndex,
                             ))
                         },
                         onAdminClick = {

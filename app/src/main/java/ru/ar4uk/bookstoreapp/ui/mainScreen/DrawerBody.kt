@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
@@ -27,6 +28,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringArrayResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -43,7 +46,8 @@ fun DrawerBody(
     onAdmin: (Boolean) -> Unit,
     onAdminClick: () -> Unit,
     onFavsClick: () -> Unit = {},
-    onCategoryClick: (String) -> Unit = {}
+    onCategoryClick: (Int) -> Unit = {},
+    onAllClick: () -> Unit = {}
 ) {
 
     val isAdminState = remember { mutableStateOf(false) }
@@ -55,13 +59,8 @@ fun DrawerBody(
         }
     }
 
-    val categoriesList = listOf(
-        "Favorites",
-        "All",
-        "Fantasy",
-        "Drama",
-        "Bestsellers"
-    )
+    val categoriesList = stringArrayResource(id = R.array.category_array)
+
     Box(modifier = Modifier
         .fillMaxSize()
         .background(Color.Gray)
@@ -93,35 +92,26 @@ fun DrawerBody(
                 .height(1.dp)
                 .background(GrayLight)
             )
+            DrawerListItem(
+                title = stringResource(R.string.favs),
+                onItemClick = {
+                    onFavsClick()
+                }
+            )
+            DrawerListItem(
+                title = stringResource(R.string.all),
+                onItemClick = {
+                    onAllClick()
+                }
+            )
             LazyColumn(modifier = Modifier.fillMaxWidth()) {
-                items(categoriesList) { item ->
-                    Column(modifier = Modifier
-                        .fillMaxWidth()
-                        .clickable {
-                            if (categoriesList[0] == item) {
-                                onFavsClick()
-                            } else {
-                                onCategoryClick(item)
-                            }
+                itemsIndexed(categoriesList) { index, item ->
+                    DrawerListItem(
+                        title = item,
+                        onItemClick = {
+                            onCategoryClick(index)
                         }
-                    ) {
-                        Spacer(modifier = Modifier.height(12.dp))
-                        Text(
-                            text = item,
-                            color = Color.White,
-                            fontSize = 20.sp,
-                            fontWeight = FontWeight.Bold,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .wrapContentWidth()
-                        )
-                        Spacer(modifier = Modifier.height(12.dp))
-                        Box(modifier = Modifier
-                            .fillMaxWidth()
-                            .height(1.dp)
-                            .background(GrayLight)
-                        )
-                    }
+                    )
                 }
             }
             if (isAdminState.value) {

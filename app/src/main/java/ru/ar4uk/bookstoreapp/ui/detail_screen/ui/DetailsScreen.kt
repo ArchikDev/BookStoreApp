@@ -17,10 +17,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.stringArrayResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
+import ru.ar4uk.bookstoreapp.R
 import ru.ar4uk.bookstoreapp.ui.detail_screen.data.DetailsNavObject
 
 @Composable
@@ -51,7 +54,7 @@ fun DetailsScreen(
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Text(text = "Категория:", color = Color.Gray)
-                    Text(text = navObject.category, fontWeight = FontWeight.Bold)
+                    Text(text = stringArrayResource(id = R.array.category_array)[navObject.categoryIndex], fontWeight = FontWeight.Bold)
                     Text(text = "Автор:", color = Color.Gray)
                     Text(text = "Я конечно", fontWeight = FontWeight.Bold)
                     Text(text = "Дата печати:", color = Color.Gray)

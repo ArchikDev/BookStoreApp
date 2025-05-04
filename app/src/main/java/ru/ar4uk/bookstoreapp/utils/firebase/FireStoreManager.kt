@@ -96,14 +96,14 @@ class FireStoreManager(
     }
 
     fun getAllBooksFromCategory(
-        category: String,
+        categoryIndex: Int,
         onBooks: (List<Book>) -> Unit,
         onFailure: (String) -> Unit
     ) {
         getAllFavsIds(
             onFavs = { idsList->
                 db.collection("books")
-                    .whereEqualTo("category", category)
+                    .whereEqualTo("category", categoryIndex)
                     .get()
                     .addOnSuccessListener { task ->
                         val booksList = task.toObjects(Book::class.java).map {

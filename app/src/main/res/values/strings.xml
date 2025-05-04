@@ -6,5 +6,6 @@
     <string name="home">Home</string>
     <string name="favs">Favs</string>
     <string name="settings">Settings</string>
+    <string name="all">All</string>
 
 </resources>

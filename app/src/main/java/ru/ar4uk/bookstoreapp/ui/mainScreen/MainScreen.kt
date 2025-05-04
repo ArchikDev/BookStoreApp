@@ -104,13 +104,16 @@ fun MainScreen(
                             drawerState.close()
                         }
                     },
-                    onCategoryClick = { category ->
-                        viewModel.getBooksFromCategory(category)
+                    onCategoryClick = { categoryIndex ->
+                        viewModel.getBooksFromCategory(categoryIndex)
                         viewModel.selectedBottomItemState.value = BottomMenuItem.Home.titleId
 
                         coroutineScope.launch {
                             drawerState.close()
                         }
+                    },
+                    onAllClick = {
+                        viewModel.getAllBooks()
                     }
                 )
             }
@@ -119,7 +122,7 @@ fun MainScreen(
         Scaffold(
             topBar = {
                 MainTopBar(
-                    title = viewModel.categoryState.value
+                    titleIndex = viewModel.categoryState.intValue
                 )
             },
             modifier = Modifier.fillMaxSize(),

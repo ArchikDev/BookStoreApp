@@ -1,7 +1,6 @@
 package ru.ar4uk.bookstoreapp.ui.add_book_screen
 
 import android.net.Uri
-import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
@@ -45,7 +44,7 @@ fun AddBookScreen(
     navData: AddScreenObject = AddScreenObject(),
     onSaved: () -> Unit = {}
 ) {
-    var selectedCategory =  remember { mutableStateOf(navData.category) }
+    var selectedCategory =  remember { mutableStateOf(navData.categoryIndex) }
     val title = remember { mutableStateOf(navData.title) }
     val description = remember { mutableStateOf(navData.description) }
     val price = remember { mutableStateOf(navData.price) }
@@ -105,9 +104,9 @@ fun AddBookScreen(
             color = Color.White
         )
         Spacer(modifier = Modifier.height(15.dp))
-        RoundedCornerDropDownMenu(selectedCategory.value) { selectedItem ->
-            selectedCategory.value = selectedItem
-        }
+//        RoundedCornerDropDownMenu(selectedCategory.value) { selectedItem ->
+//            selectedCategory.value = selectedItem
+//        }
         Spacer(modifier = Modifier.height(15.dp))
         RoundedCornerTextField(
             text = title.value,
@@ -150,7 +149,7 @@ fun AddBookScreen(
                     title = title.value,
                     description = description.value,
                     price = price.value,
-                    category = selectedCategory.value
+                    categoryIndex = selectedCategory.value
                 )
 
                 if (selectedImageUri.value != null) {
