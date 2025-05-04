@@ -20,6 +20,7 @@ class MainScreenViewModel @Inject constructor(
     val booksListState = mutableStateOf(emptyList<Book>())
     val isFavListEmptyState = mutableStateOf(false)
     val selectedBottomItemState = mutableStateOf(BottomMenuItem.Home.title)
+    val categoryState = mutableStateOf("All")
     var bookToDelete: Book? = null
 
     private val _uiState = MutableSharedFlow<MainUiState>()
@@ -32,6 +33,7 @@ class MainScreenViewModel @Inject constructor(
     }
 
     fun getAllBooks() {
+        categoryState.value = "All"
         sendUiState(MainUiState.Loading)
 
         fireStoreManager.getAllBooks(
@@ -47,6 +49,7 @@ class MainScreenViewModel @Inject constructor(
     }
 
     fun getAllFavsBooks() {
+        categoryState.value = "Favorites"
         sendUiState(MainUiState.Loading)
 
         fireStoreManager.getAllFavsBooks(
@@ -67,6 +70,8 @@ class MainScreenViewModel @Inject constructor(
             getAllBooks()
             return
         }
+
+        categoryState.value = category
 
         sendUiState(MainUiState.Loading)
 

@@ -123,7 +123,9 @@ fun MainScreen(
     ) {
         Scaffold(
             topBar = {
-                MainTopBar()
+                MainTopBar(
+                    title = viewModel.categoryState.value
+                )
             },
             modifier = Modifier.fillMaxSize(),
             bottomBar = { BottomMenu(
