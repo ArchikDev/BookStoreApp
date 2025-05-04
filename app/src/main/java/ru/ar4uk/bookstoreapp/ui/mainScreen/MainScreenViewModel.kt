@@ -19,7 +19,7 @@ class MainScreenViewModel @Inject constructor(
 ): ViewModel() {
     val booksListState = mutableStateOf(emptyList<Book>())
     val isFavListEmptyState = mutableStateOf(false)
-    val selectedBottomItemState = mutableStateOf(BottomMenuItem.Home.title)
+    val selectedBottomItemState = mutableStateOf(BottomMenuItem.Home.titleId)
     val categoryState = mutableStateOf("All")
     var bookToDelete: Book? = null
 
@@ -88,9 +88,9 @@ class MainScreenViewModel @Inject constructor(
         )
     }
 
-    fun onFavClick(book: Book, isFavState: String) {
+    fun onFavClick(book: Book, isFavState: Int) {
         val booksList = fireStoreManager.changeFavState(booksListState.value, book)
-        booksListState.value = if (isFavState == BottomMenuItem.Favs.title) {
+        booksListState.value = if (isFavState == BottomMenuItem.Favs.titleId) {
             booksList.filter { it.isFavorite }
         } else {
             booksList

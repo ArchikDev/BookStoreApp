@@ -101,7 +101,7 @@ fun LoginScreen(
                     onValueChange = {
                         viewModel.passwordState.value = it
                     },
-                    label = "Password"
+                    label = stringResource(R.string.password)
                 )
                 Spacer(modifier = Modifier.height(10.dp))
             }
@@ -115,7 +115,7 @@ fun LoginScreen(
             }
             if (!viewModel.resetPasswordState.value) {
                 LoginButton(
-                    text = "Sign In",
+                    text = stringResource(R.string.sign_in),
                     onClick = {
                         viewModel.signIn(
                             onSignInSuccess = { navData ->

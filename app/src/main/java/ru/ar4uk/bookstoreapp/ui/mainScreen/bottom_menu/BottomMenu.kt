@@ -6,16 +6,15 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import ru.ar4uk.bookstoreapp.ui.theme.DarkBlue
 import ru.ar4uk.bookstoreapp.ui.theme.PurpleGrey80
 
 @Composable
 fun BottomMenu(
-    selectedItem: String,
+    selectedItem: Int,
     onHomeClick: () -> Unit = {},
     onFavsClick: () -> Unit = {},
     onSettingsClick: () -> Unit = {}
@@ -31,12 +30,12 @@ fun BottomMenu(
     ) {
         items.forEach { item ->
             NavigationBarItem(
-                selected = selectedItem == item.title,
+                selected = selectedItem == item.titleId,
                 onClick = {
-                    when(item.title) {
-                        BottomMenuItem.Home.title -> onHomeClick()
-                        BottomMenuItem.Favs.title -> onFavsClick()
-                        BottomMenuItem.Settings.title -> onSettingsClick()
+                    when(item.titleId) {
+                        BottomMenuItem.Home.titleId -> onHomeClick()
+                        BottomMenuItem.Favs.titleId -> onFavsClick()
+                        BottomMenuItem.Settings.titleId -> onSettingsClick()
                     }
                 },
                 icon = {
@@ -47,7 +46,7 @@ fun BottomMenu(
                 },
                 label = {
                     Text(
-                        text = item.title
+                        text = stringResource(item.titleId)
                     )
                 },
                 colors = NavigationBarItemDefaults.colors(

@@ -27,14 +27,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.google.firebase.firestore.FieldPath
-import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.ktx.firestore
-import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.launch
 import ru.ar4uk.bookstoreapp.custom.MyDialog
 import ru.ar4uk.bookstoreapp.data.Book
-import ru.ar4uk.bookstoreapp.data.Favorite
 import ru.ar4uk.bookstoreapp.ui.login.data.MainScreenDataObject
 import ru.ar4uk.bookstoreapp.ui.mainScreen.bottom_menu.BottomMenu
 import ru.ar4uk.bookstoreapp.ui.mainScreen.bottom_menu.BottomMenuItem
@@ -101,7 +96,7 @@ fun MainScreen(
                         onAdminClick()
                     },
                     onFavsClick = {
-                        viewModel.selectedBottomItemState.value = BottomMenuItem.Favs.title
+                        viewModel.selectedBottomItemState.value = BottomMenuItem.Favs.titleId
 
                         viewModel.getAllFavsBooks()
 
@@ -111,7 +106,7 @@ fun MainScreen(
                     },
                     onCategoryClick = { category ->
                         viewModel.getBooksFromCategory(category)
-                        viewModel.selectedBottomItemState.value = BottomMenuItem.Home.title
+                        viewModel.selectedBottomItemState.value = BottomMenuItem.Home.titleId
 
                         coroutineScope.launch {
                             drawerState.close()
@@ -131,17 +126,17 @@ fun MainScreen(
             bottomBar = { BottomMenu(
                 viewModel.selectedBottomItemState.value,
                 onFavsClick = {
-                    viewModel.selectedBottomItemState.value = BottomMenuItem.Favs.title
+                    viewModel.selectedBottomItemState.value = BottomMenuItem.Favs.titleId
 
                     viewModel.getAllFavsBooks()
                 },
                 onHomeClick = {
-                    viewModel.selectedBottomItemState.value = BottomMenuItem.Home.title
+                    viewModel.selectedBottomItemState.value = BottomMenuItem.Home.titleId
 
                     viewModel.getAllBooks()
                 },
                 onSettingsClick = {
-                    viewModel.selectedBottomItemState.value = BottomMenuItem.Settings.title
+                    viewModel.selectedBottomItemState.value = BottomMenuItem.Settings.titleId
                 },
             ) }
         ) { paddingValues ->
