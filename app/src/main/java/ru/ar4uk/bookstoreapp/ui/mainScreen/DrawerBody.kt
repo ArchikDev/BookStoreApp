@@ -37,6 +37,7 @@ import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
 import com.google.firebase.firestore.firestore
 import ru.ar4uk.bookstoreapp.R
+import ru.ar4uk.bookstoreapp.ui.mainScreen.utils.Categories
 import ru.ar4uk.bookstoreapp.ui.theme.DarkBlue
 import ru.ar4uk.bookstoreapp.ui.theme.DarkTransparentBlue
 import ru.ar4uk.bookstoreapp.ui.theme.GrayLight
@@ -47,7 +48,6 @@ fun DrawerBody(
     onAdminClick: () -> Unit,
     onFavsClick: () -> Unit = {},
     onCategoryClick: (Int) -> Unit = {},
-    onAllClick: () -> Unit = {}
 ) {
 
     val isAdminState = remember { mutableStateOf(false) }
@@ -101,7 +101,7 @@ fun DrawerBody(
             DrawerListItem(
                 title = stringResource(R.string.all),
                 onItemClick = {
-                    onAllClick()
+                    onCategoryClick(Categories.ALL)
                 }
             )
             LazyColumn(modifier = Modifier.fillMaxWidth()) {

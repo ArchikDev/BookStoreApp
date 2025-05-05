@@ -12,17 +12,33 @@ import com.google.firebase.storage.FirebaseStorage
 import kotlinx.coroutines.tasks.await
 import ru.ar4uk.bookstoreapp.data.Book
 import ru.ar4uk.bookstoreapp.data.Favorite
+import ru.ar4uk.bookstoreapp.ui.mainScreen.utils.Categories
 import javax.inject.Singleton
 
 @Singleton
 class FireStoreManagerPaging(
     private val db: FirebaseFirestore
 ) {
+    var categoryType: CategoryType = CategoryType.CategoryByIndex(Categories.ALL)
+
     suspend fun nexPage(
         pageSize: Long,
         currentKey: DocumentSnapshot?
     ): Pair<QuerySnapshot, List<Book>> {
         var query: Query = db.collection("books").limit(pageSize)
+
+        query = when(categoryType) {
+            is CategoryType.Favorites -> {query}
+            is CategoryType.CategoryByIndex -> {
+                val categoryIndex = (categoryType as CategoryType.CategoryByIndex).index
+                if (categoryIndex == Categories.ALL) {
+                    query
+                } else {
+                    query.whereEqualTo("category", categoryIndex)
+                }
+
+            }
+        }
 
         if (currentKey != null) {
             query = query.startAfter(currentKey)
@@ -35,6 +51,10 @@ class FireStoreManagerPaging(
     }
 
 
+    sealed class CategoryType {
+        data object Favorites: CategoryType()
+        data class CategoryByIndex(val index: Int): CategoryType()
+    }
 
 
 

@@ -17,11 +17,12 @@ import ru.ar4uk.bookstoreapp.ui.mainScreen.bottom_menu.BottomMenuItem
 import ru.ar4uk.bookstoreapp.ui.mainScreen.utils.Categories.ALL
 import ru.ar4uk.bookstoreapp.ui.mainScreen.utils.Categories.FAVORITES
 import ru.ar4uk.bookstoreapp.utils.firebase.FireStoreManager
+import ru.ar4uk.bookstoreapp.utils.firebase.FireStoreManagerPaging
 import javax.inject.Inject
 
 @HiltViewModel
 class MainScreenViewModel @Inject constructor(
-    private val fireStoreManager: FireStoreManager,
+    private val fireStoreManager: FireStoreManagerPaging,
     private val pager: Flow<PagingData<Book>>,
 ): ViewModel() {
     val booksListState = mutableStateOf(emptyList<Book>())
@@ -41,22 +42,12 @@ class MainScreenViewModel @Inject constructor(
         }
     }
 
-    fun getAllBooks() {
-//        categoryState.intValue = ALL
-//        sendUiState(MainUiState.Loading)
-//
-//        fireStoreManager.getAllBooks(
-//            onBooks = { books ->
-//                booksListState.value = books
-//                isFavListEmptyState.value = books.isEmpty()
-//                sendUiState(MainUiState.Success)
-//            },
-//            onFailure = {
-//                sendUiState(MainUiState.Error(it))
-//            }
-//        )
+    fun getBooksFromCategory(categoryIndex: Int) {
+        categoryState.intValue = categoryIndex
+        fireStoreManager.categoryType = FireStoreManagerPaging.CategoryType.CategoryByIndex(categoryIndex)
     }
 
+    /*
     fun getAllFavsBooks() {
         categoryState.intValue = FAVORITES
         sendUiState(MainUiState.Loading)
@@ -117,6 +108,8 @@ class MainScreenViewModel @Inject constructor(
             }
         )
     }
+
+     */
 
     sealed class MainUiState {
         data object Loading: MainUiState()

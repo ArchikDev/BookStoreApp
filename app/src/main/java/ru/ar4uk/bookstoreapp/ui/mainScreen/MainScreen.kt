@@ -35,6 +35,7 @@ import ru.ar4uk.bookstoreapp.ui.login.data.MainScreenDataObject
 import ru.ar4uk.bookstoreapp.ui.mainScreen.bottom_menu.BottomMenu
 import ru.ar4uk.bookstoreapp.ui.mainScreen.bottom_menu.BottomMenuItem
 import ru.ar4uk.bookstoreapp.ui.mainScreen.top_app_bar.MainTopBar
+import ru.ar4uk.bookstoreapp.ui.mainScreen.utils.Categories
 
 @Composable
 fun MainScreen(
@@ -60,11 +61,6 @@ fun MainScreen(
     val context = LocalContext.current
 
     LaunchedEffect(Unit) {
-        if (viewModel.booksListState.value.isEmpty()) {
-            viewModel.getAllBooks()
-            showLoadIndicator.value = true
-        }
-
         viewModel.uiState.collect { state ->
             when(state) {
                 is MainScreenViewModel.MainUiState.Loading -> {
@@ -103,7 +99,7 @@ fun MainScreen(
                     onFavsClick = {
                         viewModel.selectedBottomItemState.intValue = BottomMenuItem.Favs.titleId
 
-                        viewModel.getAllFavsBooks()
+//                        viewModel.getAllFavsBooks()
 
                         coroutineScope.launch {
                             drawerState.close()
@@ -111,14 +107,12 @@ fun MainScreen(
                     },
                     onCategoryClick = { categoryIndex ->
                         viewModel.getBooksFromCategory(categoryIndex)
+                        books.refresh()
                         viewModel.selectedBottomItemState.intValue = BottomMenuItem.Home.titleId
 
                         coroutineScope.launch {
                             drawerState.close()
                         }
-                    },
-                    onAllClick = {
-                        viewModel.getAllBooks()
                     }
                 )
             }
@@ -136,12 +130,13 @@ fun MainScreen(
                 onFavsClick = {
                     viewModel.selectedBottomItemState.intValue = BottomMenuItem.Favs.titleId
 
-                    viewModel.getAllFavsBooks()
+//                    viewModel.getAllFavsBooks()
                 },
                 onHomeClick = {
                     viewModel.selectedBottomItemState.intValue = BottomMenuItem.Home.titleId
+                    viewModel.getBooksFromCategory(Categories.ALL)
 
-                    viewModel.getAllBooks()
+                    books.refresh()
                 },
                 onSettingsClick = {
                     viewModel.selectedBottomItemState.intValue = BottomMenuItem.Settings.titleId
@@ -164,7 +159,7 @@ fun MainScreen(
             MyDialog(
                 showDialog = showDeleteDialog.value,
                 onConfirm = {
-                    viewModel.deleteBook()
+//                    viewModel.deleteBook()
                     showDeleteDialog.value = false
                 },
                 title = "Attention!",
@@ -205,10 +200,10 @@ fun MainScreen(
                                 viewModel.booksListState.value = emptyList()
                             },
                             onFavoriteClick = {
-                                viewModel.onFavClick(
-                                    book,
-                                    viewModel.selectedBottomItemState.intValue
-                                )
+//                                viewModel.onFavClick(
+//                                    book,
+//                                    viewModel.selectedBottomItemState.intValue
+//                                )
                             },
                             onBookClick = { bk ->
                                 onBookClick(bk)
