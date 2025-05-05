@@ -5,7 +5,10 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.paging.PagingData
+import androidx.paging.cachedIn
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
@@ -18,13 +21,16 @@ import javax.inject.Inject
 
 @HiltViewModel
 class MainScreenViewModel @Inject constructor(
-    private val fireStoreManager: FireStoreManager
+    private val fireStoreManager: FireStoreManager,
+    private val pager: Flow<PagingData<Book>>,
 ): ViewModel() {
     val booksListState = mutableStateOf(emptyList<Book>())
     val isFavListEmptyState = mutableStateOf(false)
     val selectedBottomItemState = mutableIntStateOf(BottomMenuItem.Home.titleId)
     val categoryState = mutableIntStateOf(ALL)
     var bookToDelete: Book? = null
+
+    val books: Flow<PagingData<Book>> = pager.cachedIn(viewModelScope)
 
     private val _uiState = MutableSharedFlow<MainUiState>()
     val uiState = _uiState.asSharedFlow()
@@ -36,19 +42,19 @@ class MainScreenViewModel @Inject constructor(
     }
 
     fun getAllBooks() {
-        categoryState.intValue = ALL
-        sendUiState(MainUiState.Loading)
-
-        fireStoreManager.getAllBooks(
-            onBooks = { books ->
-                booksListState.value = books
-                isFavListEmptyState.value = books.isEmpty()
-                sendUiState(MainUiState.Success)
-            },
-            onFailure = {
-                sendUiState(MainUiState.Error(it))
-            }
-        )
+//        categoryState.intValue = ALL
+//        sendUiState(MainUiState.Loading)
+//
+//        fireStoreManager.getAllBooks(
+//            onBooks = { books ->
+//                booksListState.value = books
+//                isFavListEmptyState.value = books.isEmpty()
+//                sendUiState(MainUiState.Success)
+//            },
+//            onFailure = {
+//                sendUiState(MainUiState.Error(it))
+//            }
+//        )
     }
 
     fun getAllFavsBooks() {

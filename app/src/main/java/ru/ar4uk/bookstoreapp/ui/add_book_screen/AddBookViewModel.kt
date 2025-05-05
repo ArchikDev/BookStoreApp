@@ -47,6 +47,28 @@ class AddBookViewModel @Inject constructor(
         navData: AddScreenObject
     ) {
         sendUiState(MainUiState.Loading)
+
+//        for (i in 0..200) {
+//            val book = Book(
+//                id = "",
+//                title = "Title item $i",
+//                description = "Title description $i",
+//                price = i.toString(),
+//                category = 1,
+//                imageUrl = "https://firebasestorage.googleapis.com/v0/b/onlineshopcoffee-53ab2.appspot.com/o/book_images%2Fimage_1745591012695.jpg?alt=media&token=c3d8ec10-333c-4bc1-b1c0-2be0cbb6cac3"
+//            )
+//
+//            fireStoreManager.saveBookToFireStore(
+//                book = book,
+//                onSaved = {
+//                    sendUiState(MainUiState.Success)
+//                },
+//                onError = {}
+//            )
+//        }
+//
+//        return
+
         val book = Book(
             id = navData.id,
             title = title.value,

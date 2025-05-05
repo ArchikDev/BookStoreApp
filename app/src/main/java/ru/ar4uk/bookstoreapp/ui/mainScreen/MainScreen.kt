@@ -27,6 +27,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.paging.compose.collectAsLazyPagingItems
 import kotlinx.coroutines.launch
 import ru.ar4uk.bookstoreapp.custom.MyDialog
 import ru.ar4uk.bookstoreapp.data.Book
@@ -53,6 +54,8 @@ fun MainScreen(
     val isAdminState = remember {
         mutableStateOf(false)
     }
+
+    val books = viewModel.books.collectAsLazyPagingItems()
 
     val context = LocalContext.current
 
@@ -190,28 +193,32 @@ fun MainScreen(
                     .fillMaxSize()
                     .padding(paddingValues)
             ) {
-                items(viewModel.booksListState.value) { book ->
-                    BookListItemUi(
-                        isAdminState.value,
-                        book,
-                        onEditClick = { bk ->
-                            onBookEditClick(bk)
-                            viewModel.booksListState.value = emptyList()
-                        },
-                        onFavoriteClick = {
-                            viewModel.onFavClick(
-                                book,
-                                viewModel.selectedBottomItemState.intValue
-                            )
-                        },
-                        onBookClick = { bk ->
-                            onBookClick(bk)
-                        },
-                        onDeleteClick = { bkToDelete ->
-                            showDeleteDialog.value = true
-                            viewModel.bookToDelete = bkToDelete
-                        }
-                    )
+                items(count = books.itemCount) { index ->
+                    val book = books[index]
+
+                    if (book != null) {
+                        BookListItemUi(
+                            isAdminState.value,
+                            book,
+                            onEditClick = { bk ->
+                                onBookEditClick(bk)
+                                viewModel.booksListState.value = emptyList()
+                            },
+                            onFavoriteClick = {
+                                viewModel.onFavClick(
+                                    book,
+                                    viewModel.selectedBottomItemState.intValue
+                                )
+                            },
+                            onBookClick = { bk ->
+                                onBookClick(bk)
+                            },
+                            onDeleteClick = { bkToDelete ->
+                                showDeleteDialog.value = true
+                                viewModel.bookToDelete = bkToDelete
+                            }
+                        )
+                    }
                 }
             }
         }
