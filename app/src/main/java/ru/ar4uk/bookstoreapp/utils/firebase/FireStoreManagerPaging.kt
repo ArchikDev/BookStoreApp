@@ -17,9 +17,10 @@ import javax.inject.Singleton
 
 @Singleton
 class FireStoreManagerPaging(
-    private val db: FirebaseFirestore
+    private val db: FirebaseFirestore,
+    private val auth: FirebaseAuth
 ) {
-    var categoryType: CategoryType = CategoryType.CategoryByIndex(Categories.ALL)
+    var categoryIndex = Categories.ALL
 
     suspend fun nexPage(
         pageSize: Long,
@@ -27,17 +28,12 @@ class FireStoreManagerPaging(
     ): Pair<QuerySnapshot, List<Book>> {
         var query: Query = db.collection("books").limit(pageSize)
 
-        query = when(categoryType) {
-            is CategoryType.Favorites -> {query}
-            is CategoryType.CategoryByIndex -> {
-                val categoryIndex = (categoryType as CategoryType.CategoryByIndex).index
-                if (categoryIndex == Categories.ALL) {
-                    query
-                } else {
-                    query.whereEqualTo("category", categoryIndex)
-                }
+        val keysFavsList = getIdsFavsList()
 
-            }
+        query = when(categoryIndex) {
+            Categories.ALL -> query
+            Categories.FAVORITES -> query.whereIn(FieldPath.documentId(), keysFavsList)
+            else -> query.whereEqualTo("category", categoryIndex)
         }
 
         if (currentKey != null) {
@@ -46,16 +42,72 @@ class FireStoreManagerPaging(
 
         val querySnapshot = query.get().await()
         val books = querySnapshot.toObjects(Book::class.java)
+        val updatedBooks = books.map {
+            if (keysFavsList.contains(it.id)) {
+                it.copy(isFavorite = true)
+            } else {
+                it
+            }
+        }
 
-        return Pair(querySnapshot, books)
+        return Pair(querySnapshot, updatedBooks)
     }
 
+    private suspend fun getIdsFavsList(): List<String> {
+        val snapshot = getFavsCategoryReference().get().await()
 
-    sealed class CategoryType {
-        data object Favorites: CategoryType()
-        data class CategoryByIndex(val index: Int): CategoryType()
+        val idsList = snapshot.toObjects(Favorite::class.java)
+        val keysList = arrayListOf<String>()
+
+        idsList.forEach {
+            keysList.add(it.id)
+        }
+
+        return if (keysList.isEmpty()) listOf("-1") else keysList
     }
 
+    private fun getFavsCategoryReference(): CollectionReference {
+        return db.collection("users")
+            .document(auth.uid ?: "")
+            .collection("favorites")
+    }
+
+    fun onFavs(
+        favorite: Favorite,
+        isFav: Boolean
+    ) {
+        val favsDocRef = getFavsCategoryReference()
+            .document(favorite.id)
+
+        if (isFav) {
+            favsDocRef
+                .set(favorite)
+                .addOnSuccessListener { }
+                .addOnFailureListener {
+                }
+        } else {
+            favsDocRef
+                .delete()
+                .addOnSuccessListener { }
+                .addOnFailureListener {
+                }
+        }
+
+    }
+
+    fun changeFavState(books: List<Book>, book: Book): List<Book> {
+        return books.map {
+            if (it.id == book.id) {
+                onFavs(
+                    Favorite(it.id),
+                    !it.isFavorite
+                )
+                it.copy(isFavorite = !it.isFavorite)
+            } else {
+                it
+            }
+        }
+    }
 
 
 //

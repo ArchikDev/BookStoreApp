@@ -54,8 +54,9 @@ object MainModule {
     @Singleton
     fun provideFirebaseManagerPaging(
         db: FirebaseFirestore,
+        auth: FirebaseAuth,
     ): FireStoreManagerPaging {
-        return FireStoreManagerPaging(db)
+        return FireStoreManagerPaging(db, auth)
     }
 
     @Provides

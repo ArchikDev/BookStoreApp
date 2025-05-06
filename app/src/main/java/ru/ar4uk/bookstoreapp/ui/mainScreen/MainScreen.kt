@@ -94,21 +94,17 @@ fun MainScreen(
                             drawerState.close()
                         }
                         onAdminClick()
-                        viewModel.booksListState.value = emptyList()
-                    },
-                    onFavsClick = {
-                        viewModel.selectedBottomItemState.intValue = BottomMenuItem.Favs.titleId
-
-//                        viewModel.getAllFavsBooks()
-
-                        coroutineScope.launch {
-                            drawerState.close()
-                        }
+//                        viewModel.booksListState.value = emptyList()
                     },
                     onCategoryClick = { categoryIndex ->
+                        if (categoryIndex == Categories.FAVORITES) {
+                            viewModel.selectedBottomItemState.intValue = BottomMenuItem.Favs.titleId
+                        } else {
+                            viewModel.selectedBottomItemState.intValue = BottomMenuItem.Home.titleId
+                        }
+
                         viewModel.getBooksFromCategory(categoryIndex)
                         books.refresh()
-                        viewModel.selectedBottomItemState.intValue = BottomMenuItem.Home.titleId
 
                         coroutineScope.launch {
                             drawerState.close()
@@ -129,8 +125,9 @@ fun MainScreen(
                 viewModel.selectedBottomItemState.intValue,
                 onFavsClick = {
                     viewModel.selectedBottomItemState.intValue = BottomMenuItem.Favs.titleId
+                    viewModel.getBooksFromCategory(Categories.FAVORITES)
 
-//                    viewModel.getAllFavsBooks()
+                    books.refresh()
                 },
                 onHomeClick = {
                     viewModel.selectedBottomItemState.intValue = BottomMenuItem.Home.titleId
@@ -197,13 +194,14 @@ fun MainScreen(
                             book,
                             onEditClick = { bk ->
                                 onBookEditClick(bk)
-                                viewModel.booksListState.value = emptyList()
+//                                viewModel.booksListState.value = emptyList()
                             },
                             onFavoriteClick = {
-//                                viewModel.onFavClick(
-//                                    book,
-//                                    viewModel.selectedBottomItemState.intValue
-//                                )
+                                viewModel.onFavClick(
+                                    book,
+                                    viewModel.selectedBottomItemState.intValue,
+                                    books.itemSnapshotList.items
+                                )
                             },
                             onBookClick = { bk ->
                                 onBookClick(bk)

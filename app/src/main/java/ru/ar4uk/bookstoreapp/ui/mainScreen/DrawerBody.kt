@@ -46,7 +46,6 @@ import ru.ar4uk.bookstoreapp.ui.theme.GrayLight
 fun DrawerBody(
     onAdmin: (Boolean) -> Unit,
     onAdminClick: () -> Unit,
-    onFavsClick: () -> Unit = {},
     onCategoryClick: (Int) -> Unit = {},
 ) {
 
@@ -95,7 +94,7 @@ fun DrawerBody(
             DrawerListItem(
                 title = stringResource(R.string.favs),
                 onItemClick = {
-                    onFavsClick()
+                    onCategoryClick(Categories.FAVORITES)
                 }
             )
             DrawerListItem(
