@@ -12,9 +12,13 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DrawerValue
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
+import androidx.compose.material3.pulltorefresh.PullToRefreshDefaults.Indicator
+import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -38,6 +42,7 @@ import ru.ar4uk.bookstoreapp.ui.mainScreen.bottom_menu.BottomMenuItem
 import ru.ar4uk.bookstoreapp.ui.mainScreen.top_app_bar.MainTopBar
 import ru.ar4uk.bookstoreapp.ui.mainScreen.utils.Categories
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainScreen(
     viewModel: MainScreenViewModel = hiltViewModel(),
@@ -53,6 +58,8 @@ fun MainScreen(
     val isAdminState = remember {
         mutableStateOf(false)
     }
+
+    val state = rememberPullToRefreshState()
 
     val books = viewModel.books.collectAsLazyPagingItems()
 
@@ -161,52 +168,47 @@ fun MainScreen(
 
             )
 
-            if (books.loadState.refresh is LoadState.Loading) {
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    CircularProgressIndicator(
-                        modifier = Modifier.size(80.dp)
+//            if (books.loadState.refresh is LoadState.Loading) {
+//                Box(
+//                    modifier = Modifier.fillMaxSize(),
+//                    contentAlignment = Alignment.Center
+//                ) {
+//                    CircularProgressIndicator(
+//                        modifier = Modifier.size(80.dp)
+//                    )
+//                }
+//
+//            }
+
+            PullToRefreshBox(
+                isRefreshing = books.loadState.refresh is LoadState.Loading,
+                onRefresh = {
+                    books.refresh()
+                },
+                state = state,
+                modifier = Modifier.padding(paddingValues),
+                indicator = {
+                    Indicator(
+                        modifier = Modifier.align(Alignment.TopCenter),
+                        isRefreshing = books.loadState.refresh is LoadState.Loading,
+                        containerColor = Color.Red,
+                        color = Color.White,
+                        state = state
                     )
                 }
-
-            }
-
-            LazyVerticalGrid(
-                columns = GridCells.Fixed(2),
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(paddingValues)
             ) {
-                items(count = books.itemCount) { index ->
-                    val book = books[index]
+                LazyVerticalGrid(
+                    columns = GridCells.Fixed(2),
+                    modifier = Modifier
+                        .fillMaxSize()
+                ) {
+                    items(count = books.itemCount) { index ->
 
-                    if (book != null) {
-                        BookListItemUi(
-                            isAdminState.value,
-                            book,
-                            onEditClick = { bk ->
-                                onBookEditClick(bk)
-                            },
-                            onFavoriteClick = {
-                                viewModel.onFavClick(
-                                    book,
-                                    viewModel.selectedBottomItemState.intValue,
-                                    books.itemSnapshotList.items
-                                )
-                            },
-                            onBookClick = { bk ->
-                                onBookClick(bk)
-                            },
-                            onDeleteClick = { bkToDelete ->
-                                showDeleteDialog.value = true
-                                viewModel.bookToDelete = bkToDelete
-                            }
-                        )
                     }
                 }
             }
+
+
         }
     }
 }

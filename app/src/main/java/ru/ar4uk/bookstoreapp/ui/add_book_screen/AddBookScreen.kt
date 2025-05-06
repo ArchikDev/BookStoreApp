@@ -50,7 +50,7 @@ fun AddBookScreen(
     onSaved: () -> Unit = {},
     viewModel: AddBookViewModel = hiltViewModel()
 ) {
-    val context = LocalContext.current.contentResolver
+    val context = LocalContext.current
 
     val navImageUrl = remember {
         mutableStateOf(navData.imageUrl)
