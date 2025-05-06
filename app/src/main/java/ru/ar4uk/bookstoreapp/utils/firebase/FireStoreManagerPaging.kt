@@ -18,7 +18,8 @@ import javax.inject.Singleton
 @Singleton
 class FireStoreManagerPaging(
     private val db: FirebaseFirestore,
-    private val auth: FirebaseAuth
+    private val auth: FirebaseAuth,
+    private val storage: FirebaseStorage,
 ) {
     var categoryIndex = Categories.ALL
 
@@ -109,246 +110,87 @@ class FireStoreManagerPaging(
         }
     }
 
+    fun deleteBook(
+        book: Book,
+        onDeleted: () -> Unit,
+        onFailure: (String) -> Unit
+    ) {
+        db.collection("books")
+            .document(book.id)
+            .delete()
+            .addOnSuccessListener {
+                onDeleted()
+            }
+            .addOnFailureListener {
+                onFailure(it.message ?: "Error")
+            }
+    }
 
-//
-//    private fun getAllFavsIds(
-//        onFavs: (List<String>) -> Unit,
-//        onFailure: (String) -> Unit
-//    ) {
-//        getFavsCategoryReference()
-//            .get()
-//            .addOnSuccessListener { task ->
-//                val idsList = task.toObjects(Favorite::class.java)
-//                val keysList = arrayListOf<String>()
-//                idsList.forEach {
-//                    keysList.add(it.id)
-//                }
-//                onFavs(keysList)
-//            }
-//            .addOnFailureListener {
-//                onFailure(it.message ?: "Error")
-//            }
-//    }
-//
-//    fun getAllFavsBooks(
-//        onBooks: (List<Book>) -> Unit,
-//        onFailure: (String) -> Unit
-//    ) {
-//        getAllFavsIds(
-//            onFavs = { idsList->
-//                if (idsList.isNotEmpty()) {
-//                    db.collection("books")
-//                        .whereIn(FieldPath.documentId(), idsList)
-//                        .get()
-//                        .addOnSuccessListener { task ->
-//                            val booksList = task.toObjects(Book::class.java).map {
-//                                if (idsList.contains(it.id)) {
-//                                    it.copy(isFavorite = true)
-//                                } else {
-//                                    it
-//                                }
-//                            }
-//
-//                            onBooks(booksList)
-//                        }
-//                        .addOnFailureListener {
-//                            onFailure(it.message ?: "Error")
-//                        }
-//                } else {
-//                    onBooks(emptyList())
-//                }
-//            },
-//            onFailure = {
-//                onFailure(it)
-//            }
-//        )
-//    }
-//
-//    fun getAllBooks(
-//        onBooks: (List<Book>) -> Unit,
-//        onFailure: (String) -> Unit
-//    ) {
-//        getAllFavsIds(
-//            onFavs = { idsList->
-//                db.collection("books")
-//                    .get()
-//                    .addOnSuccessListener { task ->
-//                        val booksList = task.toObjects(Book::class.java).map {
-//                            if (idsList.contains(it.id)) {
-//                                it.copy(isFavorite = true)
-//                            } else {
-//                                it
-//                            }
-//                        }
-//
-//                        onBooks(booksList)
-//                    }
-//                    .addOnFailureListener {
-//                        onFailure(it.message ?: "Error")
-//                    }
-//            },
-//            onFailure = {
-//                onFailure(it)
-//            }
-//        )
-//    }
-//
-//    fun getAllBooksFromCategory(
-//        categoryIndex: Int,
-//        onBooks: (List<Book>) -> Unit,
-//        onFailure: (String) -> Unit
-//    ) {
-//        getAllFavsIds(
-//            onFavs = { idsList->
-//                db.collection("books")
-//                    .whereEqualTo("category", categoryIndex)
-//                    .get()
-//                    .addOnSuccessListener { task ->
-//                        val booksList = task.toObjects(Book::class.java).map {
-//                            if (idsList.contains(it.id)) {
-//                                it.copy(isFavorite = true)
-//                            } else {
-//                                it
-//                            }
-//                        }
-//
-//                        onBooks(booksList)
-//                    }
-//                    .addOnFailureListener {
-//                        onFailure(it.message ?: "Error")
-//                    }
-//            },
-//            onFailure = {
-//                onFailure(it)
-//            }
-//        )
-//
-//    }
-//
-//    fun onFavs(
-//        favorite: Favorite,
-//        isFav: Boolean
-//    ) {
-//        val favsDocRef = getFavsCategoryReference()
-//            .document(favorite.id)
-//
-//        if (isFav) {
-//            favsDocRef
-//                .set(favorite)
-//                .addOnSuccessListener { }
-//                .addOnFailureListener {
-//                }
-//        } else {
-//            favsDocRef
-//                .delete()
-//                .addOnSuccessListener { }
-//                .addOnFailureListener {
-//                }
-//        }
-//
-//    }
-//
-//    fun changeFavState(books: List<Book>, book: Book): List<Book> {
-//        return books.map {
-//            if (it.id == book.id) {
-//                onFavs(
-//                    Favorite(it.id),
-//                    !it.isFavorite
-//                )
-//                it.copy(isFavorite = !it.isFavorite)
-//            } else {
-//                it
-//            }
-//        }
-//    }
-//
-//    private fun getFavsCategoryReference(): CollectionReference {
-//        return db.collection("users")
-//            .document(auth.uid ?: "")
-//            .collection("favorites")
-//    }
-//
-//    fun deleteBook(
-//        book: Book,
-//        onDeleted: () -> Unit,
-//        onFailure: (String) -> Unit
-//    ) {
-//        db.collection("books")
-//            .document(book.id)
-//            .delete()
-//            .addOnSuccessListener {
-//                onDeleted()
-//            }
-//            .addOnFailureListener {
-//                onFailure(it.message ?: "Error")
-//            }
-//    }
-//
-//    private fun saveBookToFireStore(
-//        book: Book,
-//        onSaved: () -> Unit,
-//        onError: (String) -> Unit
-//    ) {
-//        val db = db.collection("books")
-//        val id = book.id.ifEmpty { db.document().id }
-//
-//        db.document(id)
-//            .set(
-//                book.copy(id = id)
-//            )
-//            .addOnSuccessListener {
-//                onSaved()
-//            }
-//            .addOnFailureListener { exception ->
-//                onError(exception.message ?: "Error")
-//            }
-//    }
-//
-//    fun saveBookImage(
-//        oldImageUrl: String,
-//        uri: Uri?,
-//        book: Book,
-//        onSaved: () -> Unit,
-//        onError: (String) -> Unit
-//    ) {
-//        val timeStamp = System.currentTimeMillis()
-//
-//        val storageRef = if (oldImageUrl.isEmpty()) {
-//            storage.reference
-//                .child("book_images")
-//                .child("image_$timeStamp.jpg")
-//        } else {
-//            storage.getReferenceFromUrl(oldImageUrl)
-//        }
-//        if (uri == null) {
-//            saveBookToFireStore(
-//                book = book.copy(imageUrl = oldImageUrl),
-//                onSaved = {
-//                    onSaved()
-//                },
-//                onError = {
-//                    onError(it)
-//                }
-//            )
-//
-//            return
-//        }
-//
-//        val uploadTask = storageRef.putFile(uri)
-//
-//        uploadTask.addOnSuccessListener {
-//            storageRef.downloadUrl.addOnSuccessListener { url ->
-//                saveBookToFireStore(
-//                    book = book.copy(imageUrl = url.toString()),
-//                    onSaved = {
-//                        onSaved()
-//                    },
-//                    onError = {
-//                        onError(it)
-//                    }
-//                )
-//            }
-//        }
-//
-//    }
+    private fun saveBookToFireStore(
+        book: Book,
+        onSaved: () -> Unit,
+        onError: (String) -> Unit
+    ) {
+        val db = db.collection("books")
+        val id = book.id.ifEmpty { db.document().id }
+
+        db.document(id)
+            .set(
+                book.copy(id = id)
+            )
+            .addOnSuccessListener {
+                onSaved()
+            }
+            .addOnFailureListener { exception ->
+                onError(exception.message ?: "Error")
+            }
+    }
+
+    fun saveBookImage(
+        oldImageUrl: String,
+        uri: Uri?,
+        book: Book,
+        onSaved: () -> Unit,
+        onError: (String) -> Unit
+    ) {
+        val timeStamp = System.currentTimeMillis()
+
+        val storageRef = if (oldImageUrl.isEmpty()) {
+            storage.reference
+                .child("book_images")
+                .child("image_$timeStamp.jpg")
+        } else {
+            storage.getReferenceFromUrl(oldImageUrl)
+        }
+        if (uri == null) {
+            saveBookToFireStore(
+                book = book.copy(imageUrl = oldImageUrl),
+                onSaved = {
+                    onSaved()
+                },
+                onError = {
+                    onError(it)
+                }
+            )
+
+            return
+        }
+
+        val uploadTask = storageRef.putFile(uri)
+
+        uploadTask.addOnSuccessListener {
+            storageRef.downloadUrl.addOnSuccessListener { url ->
+                saveBookToFireStore(
+                    book = book.copy(imageUrl = url.toString()),
+                    onSaved = {
+                        onSaved()
+                    },
+                    onError = {
+                        onError(it)
+                    }
+                )
+            }
+        }
+
+    }
 }

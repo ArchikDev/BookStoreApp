@@ -27,6 +27,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
 import kotlinx.coroutines.launch
 import ru.ar4uk.bookstoreapp.custom.MyDialog
@@ -45,9 +46,6 @@ fun MainScreen(
     onAdminClick: () -> Unit,
     onBookClick: (Book) -> Unit
 ) {
-    val showLoadIndicator = remember {
-        mutableStateOf(false)
-    }
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val coroutineScope = rememberCoroutineScope()
     val showDeleteDialog = remember { mutableStateOf(false) }
@@ -61,21 +59,17 @@ fun MainScreen(
     val context = LocalContext.current
 
     LaunchedEffect(Unit) {
-        viewModel.uiState.collect { state ->
-            when(state) {
-                is MainScreenViewModel.MainUiState.Loading -> {
-                    showLoadIndicator.value = true
-                }
-                is MainScreenViewModel.MainUiState.Success -> {
-                    showLoadIndicator.value = false
-                }
-                is MainScreenViewModel.MainUiState.Error -> {
-                    showLoadIndicator.value = false
-
-                    Toast.makeText(context, state.message, Toast.LENGTH_SHORT).show()
-                }
-
+        viewModel.uiState.collect { uiState ->
+            if (uiState is MainScreenViewModel.MainUiState.Error) {
+                Toast.makeText(context, uiState.message,Toast.LENGTH_SHORT).show()
             }
+        }
+    }
+
+    LaunchedEffect(books.loadState.refresh) {
+        if (books.loadState.refresh is LoadState.Error) {
+            val errorMessage = (books.loadState.refresh as LoadState.Error).error.message
+            Toast.makeText(context, errorMessage,Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -141,7 +135,7 @@ fun MainScreen(
             ) }
         ) { paddingValues ->
 
-            if (viewModel.isFavListEmptyState.value) {
+            if (books.itemCount == 0) {
                 Box(
                     modifier = Modifier.fillMaxSize(),
                     contentAlignment = Alignment.Center
@@ -156,7 +150,7 @@ fun MainScreen(
             MyDialog(
                 showDialog = showDeleteDialog.value,
                 onConfirm = {
-//                    viewModel.deleteBook()
+                    viewModel.deleteBook(books.itemSnapshotList.items)
                     showDeleteDialog.value = false
                 },
                 title = "Attention!",
@@ -167,7 +161,7 @@ fun MainScreen(
 
             )
 
-            if (showLoadIndicator.value) {
+            if (books.loadState.refresh is LoadState.Loading) {
                 Box(
                     modifier = Modifier.fillMaxSize(),
                     contentAlignment = Alignment.Center
@@ -194,7 +188,6 @@ fun MainScreen(
                             book,
                             onEditClick = { bk ->
                                 onBookEditClick(bk)
-//                                viewModel.booksListState.value = emptyList()
                             },
                             onFavoriteClick = {
                                 viewModel.onFavClick(

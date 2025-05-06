@@ -13,7 +13,6 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import ru.ar4uk.bookstoreapp.utils.firebase.AuthManager
-import ru.ar4uk.bookstoreapp.utils.firebase.FireStoreManager
 import ru.ar4uk.bookstoreapp.utils.firebase.FireStoreManagerPaging
 import ru.ar4uk.bookstoreapp.utils.store.StoreManager
 import javax.inject.Singleton
@@ -42,21 +41,12 @@ object MainModule {
 
     @Provides
     @Singleton
-    fun provideFirebaseManager(
-        auth: FirebaseAuth,
-        db: FirebaseFirestore,
-        storage: FirebaseStorage,
-    ): FireStoreManager {
-        return FireStoreManager(auth, db, storage)
-    }
-
-    @Provides
-    @Singleton
     fun provideFirebaseManagerPaging(
         db: FirebaseFirestore,
         auth: FirebaseAuth,
+        storage: FirebaseStorage,
     ): FireStoreManagerPaging {
-        return FireStoreManagerPaging(db, auth)
+        return FireStoreManagerPaging(db, auth, storage)
     }
 
     @Provides

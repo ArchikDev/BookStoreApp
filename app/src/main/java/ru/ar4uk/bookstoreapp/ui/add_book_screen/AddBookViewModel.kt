@@ -14,12 +14,12 @@ import ru.ar4uk.bookstoreapp.data.Book
 import ru.ar4uk.bookstoreapp.ui.add_book_screen.data.AddScreenObject
 import ru.ar4uk.bookstoreapp.ui.mainScreen.MainScreenViewModel.MainUiState
 import ru.ar4uk.bookstoreapp.ui.mainScreen.utils.Categories
-import ru.ar4uk.bookstoreapp.utils.firebase.FireStoreManager
+import ru.ar4uk.bookstoreapp.utils.firebase.FireStoreManagerPaging
 import javax.inject.Inject
 
 @HiltViewModel
 class AddBookViewModel @Inject constructor(
-    private val fireStoreManager: FireStoreManager
+    private val fireStoreManager: FireStoreManagerPaging
 ): ViewModel() {
     val title = mutableStateOf("")
     val description = mutableStateOf("")
