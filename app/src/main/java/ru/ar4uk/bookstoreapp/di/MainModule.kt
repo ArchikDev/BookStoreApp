@@ -45,8 +45,9 @@ object MainModule {
         db: FirebaseFirestore,
         auth: FirebaseAuth,
         storage: FirebaseStorage,
+        app: Application
     ): FireStoreManagerPaging {
-        return FireStoreManagerPaging(db, auth, storage)
+        return FireStoreManagerPaging(db, auth, storage, app.contentResolver)
     }
 
     @Provides

@@ -1,5 +1,6 @@
 package ru.ar4uk.bookstoreapp.utils.firebase
 
+import android.content.ContentResolver
 import android.net.Uri
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.CollectionReference
@@ -13,6 +14,7 @@ import kotlinx.coroutines.tasks.await
 import ru.ar4uk.bookstoreapp.data.Book
 import ru.ar4uk.bookstoreapp.data.Favorite
 import ru.ar4uk.bookstoreapp.ui.mainScreen.utils.Categories
+import ru.ar4uk.bookstoreapp.utils.ImageUtils
 import javax.inject.Singleton
 
 @Singleton
@@ -20,6 +22,7 @@ class FireStoreManagerPaging(
     private val db: FirebaseFirestore,
     private val auth: FirebaseAuth,
     private val storage: FirebaseStorage,
+    private val contentReslover: ContentResolver,
 ) {
     var categoryIndex = Categories.ALL
 
@@ -176,7 +179,9 @@ class FireStoreManagerPaging(
             return
         }
 
-        val uploadTask = storageRef.putFile(uri)
+        // uri - то что выбрали с устройства
+        val imageBytes = ImageUtils.uriToByteArray(uri, contentReslover)
+        val uploadTask = storageRef.putBytes(imageBytes)
 
         uploadTask.addOnSuccessListener {
             storageRef.downloadUrl.addOnSuccessListener { url ->
